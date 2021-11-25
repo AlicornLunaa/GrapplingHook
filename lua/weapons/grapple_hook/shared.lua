@@ -20,11 +20,8 @@ SWEP.Secondary.Ammo = "none"
 SWEP.launchForce = 150000
 SWEP.maxDistance = 100000
 SWEP.reelSpeed = 2
-SWEP.pullForce = 0.08
+SWEP.pullForce = 0.12
 SWEP.maxLerp = 1000
-
--- Sounds
-local firingSound = Sound("garrysmod/balloon_pop_cute.wav")
 
 -- Util functions
 local function sign(a)
@@ -75,6 +72,7 @@ function SWEP:Think()
             if not self:GetOwner():KeyDown(IN_ATTACK) then
                 -- Primary attack was let go, stop reeling
                 self:SetNWBool("reeling", false)
+                self:StopSound("reel_sound")
             end
         end
 
@@ -87,9 +85,40 @@ function SWEP:Think()
             if not self:GetOwner():KeyDown(IN_ATTACK2) then
                 -- Secondary attack was let go, stop expanding
                 self:SetNWBool("expanding", false)
+                self:StopSound("reel_sound")
             end
         end
     end
+end
+
+function SWEP:Initialize()
+    -- Create sounds
+    sound.Add({
+        name = "firing_sound",
+        channel = CHAN_STATIC,
+        volume = 1.0,
+        level = 80,
+        pitch = 100,
+        sound = "ambient/materials/clang1.wav"
+    })
+
+    sound.Add({
+        name = "release_sound",
+        channel = CHAN_STATIC,
+        volume = 1.0,
+        level = 80,
+        pitch = 100,
+        sound = "ambient/tones/elev2.wav"
+    })
+
+    sound.Add({
+        name = "reel_sound",
+        channel = CHAN_STATIC,
+        volume = 1.0,
+        level = 80,
+        pitch = 100,
+        sound = "ambient/tones/fan2_loop.wav"
+    })
 end
 
 function SWEP:Deploy()
@@ -102,22 +131,21 @@ function SWEP:Holster()
 end
 
 function SWEP:Reload()
-    -- Serverside code
-    if SERVER then
-        -- Reload detaches the hook if its deployed
-        local isLaunched = self:GetNWBool("launched", false)
-        local _hook = self:GetNWEntity("hook")
+    -- Reload detaches the hook if its deployed
+    local isLaunched = self:GetNWBool("launched", false)
+    local _hook = self:GetNWEntity("hook")
 
-        if isLaunched then
-            -- Hook exists, remove it after 3 seconds and also detach it within code
-            self:SetNWBool("launched", false)
+    if isLaunched then
+        -- Hook exists, remove it after 3 seconds and also detach it within code
+        self:SetNWBool("launched", false)
+        self:EmitSound("release_sound")
 
-            timer.Simple(3, function()
-                if _hook:IsValid() then
-                    _hook:Remove()
-                end
-            end )
-        end
+        timer.Simple(3, function()
+            -- Only server can remove the hook
+            if SERVER and _hook:IsValid() then
+                _hook:Remove()
+            end
+        end )
     end
 end
 
@@ -129,15 +157,16 @@ function SWEP:PrimaryAttack()
     local isLaunched = self:GetNWBool("launched", false)
 
     -- Run functions
-    if SERVER then
-        -- Serverside code
-        if isLaunched then
-            -- Hook already launched, reel it in if its hooked.
-            self:SetNWBool("reeling", true)
-        else
-            -- Hook has not been launched, launch it.
-            self:EmitSound(firingSound)
+    if isLaunched then
+        -- Hook already launched, reel it in if its hooked.
+        self:SetNWBool("reeling", true)
+        self:EmitSound("reel_sound")
+    else
+        -- Hook has not been launched, launch it.
+        self:EmitSound("firing_sound")
 
+        -- Serverside only
+        if SERVER then
             -- Spawn the hook at hand and launch it in the look direction
             local attachmentPoint = self:GetOwner():GetAttachment(5)
             local ent = ents.Create("hook")
@@ -146,16 +175,19 @@ function SWEP:PrimaryAttack()
             ent:Spawn()
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 
-            local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+            -- Setup the launch function to activate once the key is released
+            hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
+                if key == IN_ATTACK then
+                    local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+                    self:SetNWFloat("lastDistance", distance)
+                    self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
+                    self:SetNWEntity("hook", ent)
+                    self:SetNWBool("launched", true)
 
-            self:SetNWFloat("lastDistance", distance)
-            self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
-            self:SetNWEntity("hook", ent)
-            self:SetNWBool("launched", true)
+                    hook.Remove("KeyRelease", "hookLaunchActive")
+                end
+            end )
         end
-    else
-        -- Clientside code
-
     end
 end
 
@@ -165,8 +197,9 @@ function SWEP:SecondaryAttack()
     local isLaunched = self:GetNWBool("launched", false)
 
     -- Serverside code
-    if SERVER and isLaunched then
+    if isLaunched then
         self:SetNWBool("expanding", true)
+        self:EmitSound("reel_sound")
     end
 end
 

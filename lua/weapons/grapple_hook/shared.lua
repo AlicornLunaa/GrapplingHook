@@ -122,15 +122,6 @@ function SWEP:Initialize()
     })
 end
 
-function SWEP:Deploy()
-    -- This function will create the hook at the end
-    return true
-end
-
-function SWEP:Holster(wep)
-    return true
-end
-
 function SWEP:Reload()
     -- Reload detaches the hook if its deployed
     local isLaunched = self:GetNWBool("launched", false)

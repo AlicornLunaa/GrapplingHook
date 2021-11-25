@@ -98,8 +98,8 @@ function SWEP:Initialize()
         name = "firing_sound",
         channel = CHAN_STATIC,
         volume = 1.0,
-        level = 80,
-        pitch = 100,
+        level = 60,
+        pitch = { 80, 100 },
         sound = "ambient/materials/clang1.wav"
     })
 
@@ -107,8 +107,8 @@ function SWEP:Initialize()
         name = "release_sound",
         channel = CHAN_STATIC,
         volume = 1.0,
-        level = 80,
-        pitch = 100,
+        level = 60,
+        pitch = { 80, 100 },
         sound = "ambient/tones/elev2.wav"
     })
 

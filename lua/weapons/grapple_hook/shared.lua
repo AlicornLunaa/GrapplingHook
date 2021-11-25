@@ -19,7 +19,7 @@ SWEP.Secondary.Ammo = "none"
 -- Swep config
 SWEP.launchForce = 150000
 SWEP.maxDistance = 100000
-SWEP.reelSpeed = 2
+SWEP.reelSpeed = 4
 SWEP.pullForce = 0.12
 SWEP.maxLerp = 1000
 
@@ -123,11 +123,11 @@ end
 
 function SWEP:Deploy()
     -- This function will create the hook at the end
-
+    return true
 end
 
-function SWEP:Holster()
-
+function SWEP:Holster(wep)
+    return true
 end
 
 function SWEP:Reload()
@@ -164,6 +164,7 @@ function SWEP:PrimaryAttack()
     else
         -- Hook has not been launched, launch it.
         self:EmitSound("firing_sound")
+        self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
         -- Serverside only
         if SERVER then

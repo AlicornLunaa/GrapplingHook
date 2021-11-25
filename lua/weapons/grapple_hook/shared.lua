@@ -120,6 +120,15 @@ function SWEP:Initialize()
         pitch = 100,
         sound = "ambient/tones/fan2_loop.wav"
     })
+
+    -- Create model to render on gun
+    if CLIENT then
+        local ent = ents.CreateClientside("hook")
+        ent:Initialize()
+        ent:SetNoDraw(true)
+
+        self.hookMdl = ent
+    end
 end
 
 function SWEP:Reload()
@@ -165,10 +174,11 @@ function SWEP:PrimaryAttack()
         -- Serverside only
         if SERVER then
             -- Spawn the hook at hand and launch it in the look direction
+            local viewModel = self:GetOwner():GetViewModel()
             local attachmentPoint = self:GetAttachment(1)
             local ent = ents.Create("hook")
-            ent:SetPos(attachmentPoint.Pos)
-            ent:SetAngles(attachmentPoint.Ang + Angle(0, -90, 0))
+            ent:SetPos(attachmentPoint.Pos - viewModel:GetForward() * 8)
+            ent:SetAngles(viewModel:LocalToWorldAngles(Angle(90, 0, 0)))
             ent:SetOwner(self:GetOwner())
             ent:Spawn()
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
@@ -206,15 +216,21 @@ function SWEP:ViewModelDrawn(ent)
     if CLIENT then
         -- Draw the beam for the viewmodel
         -- Get networked information
+        local attachmentPoint = self:GetOwner():GetViewModel():GetAttachment(1)
         local _hook = self:GetNWEntity("hook")
 
         -- Get location to attach to
         if _hook:IsValid() and self.ropeAttached then
-            local attachmentPoint = self:GetOwner():GetViewModel():GetAttachment(1)
-
             cam.Start3D()
                 render.SetMaterial(self.cableMaterial)
                 render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, Color(255, 255, 255))
+            cam.End3D()
+        else
+            -- Draw h ook on the gun because it's not launched
+            cam.Start3D()
+                self.hookMdl:SetRenderOrigin(attachmentPoint.Pos - ent:GetForward() * 8)
+                self.hookMdl:SetRenderAngles(ent:LocalToWorldAngles(Angle(90, 0, 0)))
+                self.hookMdl:DrawModel()
             cam.End3D()
         end
     end
@@ -226,14 +242,19 @@ function SWEP:DrawWorldModel(flags)
         self:DrawModel(flags)
 
         -- Get networked information
+        local attachmentPoint = self:GetAttachment(1)
         local _hook = self:GetNWEntity("hook")
 
         -- Get location to attach to
         if _hook:IsValid() and self.ropeAttached then
-            local attachmentPoint = self:GetAttachment(1)
-
             render.SetMaterial(self.cableMaterial)
             render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, attachmentPoint.Pos)
+        else
+            -- Draw the hook since there is none launched
+            local pos, ang = LocalToWorld(Vector(-8, -0.5, 0), Angle(90, 0, 0), attachmentPoint.Pos, attachmentPoint.Ang)
+            self.hookMdl:SetRenderOrigin(pos)
+            self.hookMdl:SetRenderAngles(ang)
+            self.hookMdl:DrawModel()
         end
     end
 end

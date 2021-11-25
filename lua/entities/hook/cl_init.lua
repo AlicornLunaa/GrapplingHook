@@ -1,6 +1,6 @@
 include("shared.lua")
 
-function ENT:Initialize()
+function ENT:CreateModels()
     -- This function will create the clientside models to
     -- create the hook
     -- Hook model
@@ -27,6 +27,9 @@ function ENT:Initialize()
 end
 
 function ENT:Draw()
+    -- Make sure models exist
+    if !self.baseMdl or !self.baseMdl:IsValid() then self:CreateModels() end
+
     -- Draw the model
     self.baseMdl:SetRenderOrigin(self:LocalToWorld(Vector(0, 0, 3)))
     self.baseMdl:SetRenderAngles(self:GetAngles())

@@ -124,7 +124,6 @@ function SWEP:Initialize()
     -- Create model to render on gun
     if CLIENT then
         local ent = ents.CreateClientside("hook")
-        ent:Initialize()
         ent:SetNoDraw(true)
 
         self.hookMdl = ent
@@ -226,7 +225,7 @@ function SWEP:ViewModelDrawn(ent)
                 render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, Color(255, 255, 255))
             cam.End3D()
         else
-            -- Draw h ook on the gun because it's not launched
+            -- Draw hook on the gun because it's not launched
             cam.Start3D()
                 self.hookMdl:SetRenderOrigin(attachmentPoint.Pos - ent:GetForward() * 8)
                 self.hookMdl:SetRenderAngles(ent:LocalToWorldAngles(Angle(90, 0, 0)))
@@ -249,7 +248,7 @@ function SWEP:DrawWorldModel(flags)
         if _hook:IsValid() and self.ropeAttached then
             render.SetMaterial(self.cableMaterial)
             render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, attachmentPoint.Pos)
-        else
+        elseif self.hookMdl:IsValid() and attachmentPoint then
             -- Draw the hook since there is none launched
             local pos, ang = LocalToWorld(Vector(-8, -0.5, 0), Angle(90, 0, 0), attachmentPoint.Pos, attachmentPoint.Ang)
             self.hookMdl:SetRenderOrigin(pos)

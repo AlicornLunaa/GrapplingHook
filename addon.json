@@ -1,0 +1,13 @@
+{
+	"title"		:	"Grappling Hook",
+	"type"		:	"weapon",
+	"tags"		:	[ "fun" ],
+	"ignore"	:
+	[
+		"*.md",
+		".gitignore",
+		"*.code-workspace",
+		"icon.jpg",
+		".git/*"
+	]
+}

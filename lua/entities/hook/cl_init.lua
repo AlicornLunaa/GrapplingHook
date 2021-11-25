@@ -34,13 +34,11 @@ function ENT:Draw()
 
     -- Draw the hooks rotated around
     local pos = Vector(0, -1.75, 6)
-    local ang = Angle(0, 0, 0)
+    local ang = Angle(180, 0, 0)
 
     for i = 1, 3 do
         self.hookMdl:SetRenderOrigin(self:LocalToWorld(pos))
         self.hookMdl:SetRenderAngles(self:LocalToWorldAngles(ang))
-        self.hookMdl:SetRenderClipPlaneEnabled(true)
-        self.hookMdl:SetRenderClipPlane(self:GetUp(), 1)
         self.hookMdl:SetupBones()
         self.hookMdl:DrawModel()
 

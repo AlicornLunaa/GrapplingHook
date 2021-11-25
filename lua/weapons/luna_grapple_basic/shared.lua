@@ -1,6 +1,6 @@
 -- Swep info
 SWEP.Author	= "AlicornLunaa"
-SWEP.Instructions = "Left click to launch a hook.\nOnce the hook is taken, hold left click to retract and right click to expand. R to detach the hook."
+SWEP.Instructions = "Primary to launch and reel\nSecondary to expand\nReload to detach"
 
 SWEP.Spawnable = true
 SWEP.ViewModel = "models/weapons/v_pistol.mdl"
@@ -23,6 +23,7 @@ SWEP.reelSpeed = 4
 SWEP.pullForce = 0.12
 SWEP.maxLerp = 1000
 SWEP.cableMaterial = Material("cable/cable2")
+SWEP.hookClass = "luna_hook_basic"
 
 -- Utility functions
 local function sign(a)
@@ -123,7 +124,7 @@ function SWEP:Initialize()
 
     -- Create model to render on gun
     if CLIENT then
-        local ent = ents.CreateClientside("hook")
+        local ent = ents.CreateClientside(self.hookClass)
         ent:SetNoDraw(true)
 
         self.hookMdl = ent
@@ -175,7 +176,7 @@ function SWEP:PrimaryAttack()
             -- Spawn the hook at hand and launch it in the look direction
             local viewModel = self:GetOwner():GetViewModel()
             local attachmentPoint = self:GetAttachment(1)
-            local ent = ents.Create("hook")
+            local ent = ents.Create(self.hookClass)
             ent:SetPos(attachmentPoint.Pos - viewModel:GetForward() * 8)
             ent:SetAngles(viewModel:LocalToWorldAngles(Angle(90, 0, 0)))
             ent:SetOwner(self:GetOwner())

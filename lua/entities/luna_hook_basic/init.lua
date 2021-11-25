@@ -16,10 +16,3 @@ function ENT:Initialize()
         phys:Wake()
     end
 end
-
-function ENT:Think()
-
-end
-
-function ENT:OnRemove()
-end

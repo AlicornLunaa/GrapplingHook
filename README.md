@@ -1,2 +1,2 @@
-# Grappling hook
-Simple grappling hook addon I wanted to make.
+# Luna's grappling hooks
+Assorted grappling hooks for the game Garry's Mod.

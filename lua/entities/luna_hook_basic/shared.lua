@@ -1,7 +1,7 @@
 ENT.Type = "anim"
 ENT.Base = "base_gmodentity"
 
-ENT.PrintName = "Hook"
+ENT.PrintName = "Basic hook"
 ENT.Author = "AlicornLunaa"
 
 ENT.Spawnable = false

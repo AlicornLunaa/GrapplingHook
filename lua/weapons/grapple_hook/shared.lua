@@ -18,6 +18,7 @@ SWEP.Secondary.Ammo = "none"
 
 -- Swep config
 SWEP.launchForce = 150000
+SWEP.pullForce = 10
 
 -- Sounds
 local firingSound = Sound("garrysmod/balloon_pop_cute.wav")
@@ -28,13 +29,22 @@ function SWEP:Think()
     if SERVER then
         -- Get variables
         local reeling = self:GetNWBool("reeling", false)
+        local _hook = self:GetNWEntity("hook")
 
         -- Pull the player AND hook together
         if reeling then
-            -- Forces for hooks and player
+            if _hook:IsValid() and self:GetOwner():IsValid() then
+                -- Get directions for hooks
+                local ownerToHook = (_hook:GetPos() - self:GetOwner():GetPos()):GetNormalized()
+                local hookToOwner = (self:GetOwner():GetPos() - _hook:GetPos()):GetNormalized()
+
+                -- Forces for hooks and player
+                self:GetOwner():SetVelocity(ownerToHook * self.pullForce)
+                _hook:GetPhysicsObject():ApplyForceCenter(hookToOwner * self.pullForce * 10)
+            end
 
             -- Check for a continuous hold of the reel button
-            if self:GetOwner():KeyDown(IN_ATTACK) then
+            if not self:GetOwner():KeyDown(IN_ATTACK) then
                 -- Primary attack was let go, stop reeling
                 self:SetNWBool("reeling", false)
             end

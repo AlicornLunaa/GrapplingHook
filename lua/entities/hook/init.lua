@@ -21,5 +21,4 @@ function ENT:Think()
 end
 
 function ENT:OnRemove()
-
 end

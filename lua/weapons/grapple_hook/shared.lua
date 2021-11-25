@@ -22,8 +22,9 @@ SWEP.maxDistance = 100000
 SWEP.reelSpeed = 4
 SWEP.pullForce = 0.12
 SWEP.maxLerp = 1000
+SWEP.cableMaterial = Material("cable/cable2")
 
--- Util functions
+-- Utility functions
 local function sign(a)
     -- This function returns a -1 0 or 1 depending on the sign on the variable supplied
     if a < 0 then
@@ -140,6 +141,8 @@ function SWEP:Reload()
         self:SetNWBool("launched", false)
         self:EmitSound("release_sound")
 
+        self.ropeAttached = false
+
         timer.Simple(3, function()
             -- Only server can remove the hook
             if SERVER and _hook:IsValid() then
@@ -166,15 +169,20 @@ function SWEP:PrimaryAttack()
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
+        self.ropeAttached = true
+
         -- Serverside only
         if SERVER then
             -- Spawn the hook at hand and launch it in the look direction
-            local attachmentPoint = self:GetOwner():GetAttachment(5)
+            local attachmentPoint = self:GetAttachment(1)
             local ent = ents.Create("hook")
             ent:SetPos(attachmentPoint.Pos)
-            ent:SetAngles(attachmentPoint.Ang)
+            ent:SetAngles(attachmentPoint.Ang + Angle(0, -90, 0))
+            ent:SetOwner(self:GetOwner())
             ent:Spawn()
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
+
+            self:SetNWEntity("hook", ent)
 
             -- Setup the launch function to activate once the key is released
             hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
@@ -182,7 +190,6 @@ function SWEP:PrimaryAttack()
                     local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
                     self:SetNWFloat("lastDistance", distance)
                     self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
-                    self:SetNWEntity("hook", ent)
                     self:SetNWBool("launched", true)
 
                     hook.Remove("KeyRelease", "hookLaunchActive")
@@ -204,6 +211,38 @@ function SWEP:SecondaryAttack()
     end
 end
 
-function SWEP:ViewModelDrawn()
+function SWEP:ViewModelDrawn(ent)
+    if CLIENT then
+        -- Draw the beam for the viewmodel
+        -- Get networked information
+        local _hook = self:GetNWEntity("hook")
 
+        -- Get location to attach to
+        if _hook:IsValid() and self.ropeAttached then
+            local attachmentPoint = self:GetOwner():GetViewModel():GetAttachment(1)
+
+            cam.Start3D()
+                render.SetMaterial(self.cableMaterial)
+                render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, Color(255, 255, 255))
+            cam.End3D()
+        end
+    end
+end
+
+function SWEP:DrawWorldModel(flags)
+    if CLIENT then
+        -- Draw the gun and rope to the hook
+        self:DrawModel(flags)
+
+        -- Get networked information
+        local _hook = self:GetNWEntity("hook")
+
+        -- Get location to attach to
+        if _hook:IsValid() and self.ropeAttached then
+            local attachmentPoint = self:GetAttachment(1)
+
+            render.SetMaterial(self.cableMaterial)
+            render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, attachmentPoint.Pos)
+        end
+    end
 end

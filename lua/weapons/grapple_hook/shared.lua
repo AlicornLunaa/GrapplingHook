@@ -26,6 +26,18 @@ SWEP.maxLerp = 1000
 -- Sounds
 local firingSound = Sound("garrysmod/balloon_pop_cute.wav")
 
+-- Util functions
+local function sign(a)
+    -- This function returns a -1 0 or 1 depending on the sign on the variable supplied
+    if a < 0 then
+        return -1
+    elseif a > 0 then
+        return 1
+    else
+        return 0
+    end
+end
+
 -- Functions
 function SWEP:Think()
     -- Serverside code
@@ -42,8 +54,14 @@ function SWEP:Think()
             local ownerToHook = (_hook:GetPos() - self:GetOwner():GetPos()):GetNormalized()
             local hookToOwner = (self:GetOwner():GetPos() - _hook:GetPos()):GetNormalized()
 
+            -- Get a variable to check if theyre moving towards or away the hook
+            local currentDistance = self:GetOwner():GetPos():Distance(_hook:GetPos())
+            local deltaDistance = currentDistance - self:GetNWFloat("lastDistance", 1)
+            local distanceSign = sign(deltaDistance)
+            self:SetNWFloat("lastDistance", currentDistance)
+
             -- Forces for hooks and player
-            local distanceForce = self:GetOwner():GetPos():Distance(_hook:GetPos()) - self:GetNWFloat("distance", 1) + math.Clamp(self:GetOwner():GetVelocity():Length(), -self.maxLerp, self.maxLerp)
+            local distanceForce = math.max(currentDistance - self:GetNWFloat("distance", 1) + math.Clamp(self:GetOwner():GetVelocity():Length(), -self.maxLerp, self.maxLerp) * distanceSign, 0)
             self:GetOwner():SetVelocity(ownerToHook * self.pullForce * distanceForce)
             _hook:GetPhysicsObject():ApplyForceCenter(hookToOwner * self.pullForce * 100 * distanceForce)
         end
@@ -128,7 +146,10 @@ function SWEP:PrimaryAttack()
             ent:Spawn()
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 
-            self:SetNWFloat("distance", math.Clamp(self:GetOwner():GetPos():Distance(ent:GetPos()), 1, self.maxDistance))
+            local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+
+            self:SetNWFloat("lastDistance", distance)
+            self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
             self:SetNWEntity("hook", ent)
             self:SetNWBool("launched", true)
         end

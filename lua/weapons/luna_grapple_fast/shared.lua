@@ -1,21 +1,8 @@
 -- Swep info
-SWEP.Base = "luna_grapple_basic"
+SWEP.Base = "luna_grapple_base"
 SWEP.Author	= "AlicornLunaa"
 SWEP.Instructions = "Primary to launch\nRelease to detach"
-
 SWEP.Spawnable = true
-SWEP.ViewModel = "models/weapons/v_pistol.mdl"
-SWEP.WorldModel = "models/weapons/w_pistol.mdl"
-
-SWEP.Primary.ClipSize = -1
-SWEP.Primary.DefaultClip = -1
-SWEP.Primary.Automatic = false
-SWEP.Primary.Ammo = "none"
-
-SWEP.Secondary.ClipSize = -1
-SWEP.Secondary.DefaultClip = -1
-SWEP.Secondary.Automatic = false
-SWEP.Secondary.Ammo = "none"
 
 -- Swep config
 SWEP.launchForce = 450000
@@ -49,11 +36,12 @@ function SWEP:Think()
         -- Pull the player AND hook together
         if launched and _hook:IsValid() and self:GetOwner():IsValid() then
             -- Get directions for hooks
-            local ownerToHook = (_hook:GetPos() - self:GetOwner():GetPos()):GetNormalized()
-            local hookToOwner = (self:GetOwner():GetPos() - _hook:GetPos()):GetNormalized()
+            local hookPos = _hook:LocalToWorld(_hook.attachPosition)
+            local ownerToHook = (hookPos - self:GetOwner():GetPos()):GetNormalized()
+            local hookToOwner = (self:GetOwner():GetPos() - hookPos):GetNormalized()
 
             -- Get a variable to check if theyre moving towards or away the hook
-            local currentDistance = self:GetOwner():GetPos():Distance(_hook:GetPos())
+            local currentDistance = self:GetOwner():GetPos():Distance(hookPos)
             local deltaDistance = currentDistance - self:GetNWFloat("lastDistance", 1)
             local distanceSign = sign(deltaDistance)
             self:SetNWFloat("lastDistance", currentDistance)
@@ -71,51 +59,10 @@ function SWEP:Think()
             self:SetNWBool("launched", false)
             self:EmitSound("release_sound")
 
-            timer.Simple(3, function()
-                -- Only server can remove the hook
-                if SERVER and _hook:IsValid() then
-                    _hook:Remove()
-                end
-            end )
+            if SERVER and _hook:IsValid() then
+                _hook:Remove()
+            end
         end
-    end
-end
-
-function SWEP:Initialize()
-    -- Create sounds
-    sound.Add({
-        name = "firing_sound",
-        channel = CHAN_STATIC,
-        volume = 1.0,
-        level = 60,
-        pitch = { 80, 100 },
-        sound = "ambient/materials/clang1.wav"
-    })
-
-    sound.Add({
-        name = "release_sound",
-        channel = CHAN_STATIC,
-        volume = 1.0,
-        level = 60,
-        pitch = { 80, 100 },
-        sound = "ambient/tones/elev2.wav"
-    })
-
-    sound.Add({
-        name = "reel_sound",
-        channel = CHAN_STATIC,
-        volume = 1.0,
-        level = 80,
-        pitch = 100,
-        sound = "ambient/tones/fan2_loop.wav"
-    })
-
-    -- Create model to render on gun
-    if CLIENT then
-        local ent = ents.CreateClientside(self.hookClass)
-        ent:SetNoDraw(true)
-
-        self.hookMdl = ent
     end
 end
 
@@ -135,14 +82,16 @@ function SWEP:PrimaryAttack()
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
+        self.ropeAttached = true
+
         -- Serverside only
         if SERVER then
             -- Spawn the hook at hand and launch it in the look direction
             local viewModel = self:GetOwner():GetViewModel()
             local attachmentPoint = self:GetAttachment(1)
             local ent = ents.Create(self.hookClass)
-            ent:SetPos(attachmentPoint.Pos + viewModel:GetForward() * 8)
-            ent:SetAngles(viewModel:LocalToWorldAngles(Angle(90, 180, 0)))
+            ent:SetPos(attachmentPoint.Pos + viewModel:GetForward() * ent.positionOffset.x)
+            ent:SetAngles(viewModel:LocalToWorldAngles(ent.angleOffset))
             ent:SetOwner(self:GetOwner())
             ent:Spawn()
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
@@ -153,58 +102,6 @@ function SWEP:PrimaryAttack()
             self:SetNWFloat("lastDistance", distance)
             self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
             self:SetNWBool("launched", true)
-        end
-    end
-end
-
-function SWEP:ViewModelDrawn(ent)
-    if CLIENT then
-        -- Draw the beam for the viewmodel
-        -- Get networked information
-        local attachmentPoint = self:GetOwner():GetViewModel():GetAttachment(1)
-        local _hook = self:GetNWEntity("hook")
-
-        ent:SetColor(self.weaponColor)
-        self.hookMdl:SetColor(self.weaponColor)
-
-        -- Get location to attach to
-        if _hook:IsValid() then
-            _hook:SetColor(self.weaponColor)
-
-            cam.Start3D()
-                render.SetMaterial(self.cableMaterial)
-                render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, Color(255, 255, 255))
-            cam.End3D()
-        else
-            -- Draw hook on the gun because it's not launched
-            cam.Start3D()
-                self.hookMdl:SetRenderOrigin(attachmentPoint.Pos + ent:GetForward() * 8)
-                self.hookMdl:SetRenderAngles(ent:LocalToWorldAngles(Angle(90, 180, 0)))
-                self.hookMdl:DrawModel()
-            cam.End3D()
-        end
-    end
-end
-
-function SWEP:DrawWorldModel(flags)
-    if CLIENT then
-        -- Draw the gun and rope to the hook
-        self:DrawModel(flags)
-
-        -- Get networked information
-        local attachmentPoint = self:GetAttachment(1)
-        local _hook = self:GetNWEntity("hook")
-
-        -- Get location to attach to
-        if _hook:IsValid() then
-            render.SetMaterial(self.cableMaterial)
-            render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, attachmentPoint.Pos)
-        elseif self.hookMdl:IsValid() and attachmentPoint then
-            -- Draw the hook since there is none launched
-            local pos, ang = LocalToWorld(Vector(8, -0.5, 0), Angle(90, 180, 0), attachmentPoint.Pos, attachmentPoint.Ang)
-            self.hookMdl:SetRenderOrigin(pos)
-            self.hookMdl:SetRenderAngles(ang)
-            self.hookMdl:DrawModel()
         end
     end
 end

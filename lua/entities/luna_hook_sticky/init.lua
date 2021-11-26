@@ -40,7 +40,7 @@ function ENT:Think()
         self.attached = true
     end
 
-    if self.attached and (!self.parent or self.parent:IsValid()) then
+    if self.attached and !self.parent then
         self.parent = false
         self.attached = false
     end

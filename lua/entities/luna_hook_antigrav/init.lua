@@ -17,6 +17,7 @@ function ENT:Initialize()
     local phys = self:GetPhysicsObject()
     if phys:IsValid() then
         phys:SetMass(100)
+        phys:EnableGravity(false)
         phys:Wake()
     end
 end

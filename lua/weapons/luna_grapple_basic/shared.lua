@@ -264,3 +264,9 @@ function SWEP:DrawWorldModel(flags)
         end
     end
 end
+
+function SWEP:Holster()
+    -- Weapon was holstered, fix colors
+    self:GetOwner():GetViewModel():SetColor(Color(255, 255, 255))
+    return true
+end

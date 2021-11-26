@@ -54,5 +54,6 @@ function ENT:PhysicsCollide(collision, collider)
         self.lastCollision = collision
 
         self:EmitSound("garrysmod/balloon_pop_cute.wav")
+        self.parent:EmitSound("common/stuck1.wav", 120)
     end
 end

@@ -24,6 +24,7 @@ SWEP.pullForce = 0.12
 SWEP.maxLerp = 1000
 SWEP.cableMaterial = Material("cable/cable2")
 SWEP.hookClass = "luna_hook_basic"
+SWEP.weaponColor = Color(255, 255, 255)
 
 -- Utility functions
 local function sign(a)
@@ -219,8 +220,13 @@ function SWEP:ViewModelDrawn(ent)
         local attachmentPoint = self:GetOwner():GetViewModel():GetAttachment(1)
         local _hook = self:GetNWEntity("hook")
 
+        ent:SetColor(self.weaponColor)
+        self.hookMdl:SetColor(self.weaponColor)
+
         -- Get location to attach to
         if _hook:IsValid() and self.ropeAttached then
+            _hook:SetColor(self.weaponColor)
+
             cam.Start3D()
                 render.SetMaterial(self.cableMaterial)
                 render.DrawBeam(attachmentPoint.Pos, _hook:GetPos(), 1, 1, 1, Color(255, 255, 255))

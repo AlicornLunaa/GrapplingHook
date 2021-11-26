@@ -33,6 +33,7 @@ function ENT:Draw()
     -- Draw the model
     self.baseMdl:SetRenderOrigin(self:LocalToWorld(Vector(0, 0, 3)))
     self.baseMdl:SetRenderAngles(self:GetAngles())
+    self.baseMdl:SetColor(self:GetColor())
     self.baseMdl:DrawModel()
 
     -- Draw the hooks rotated around
@@ -42,6 +43,7 @@ function ENT:Draw()
     for i = 1, 3 do
         self.hookMdl:SetRenderOrigin(self:LocalToWorld(pos))
         self.hookMdl:SetRenderAngles(self:LocalToWorldAngles(ang))
+        self.hookMdl:SetColor(self:GetColor())
         self.hookMdl:SetupBones()
         self.hookMdl:DrawModel()
 

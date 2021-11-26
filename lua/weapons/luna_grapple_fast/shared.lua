@@ -24,7 +24,7 @@ SWEP.pullForce = 0.12
 SWEP.maxLerp = 0
 SWEP.cableMaterial = Material("cable/cable2")
 SWEP.hookClass = "luna_hook_sticky"
-SWEP.weaponColor = Color(255, 255, 100)
+SWEP.weaponColor = Color(100, 100, 250)
 
 -- Utility functions
 local function sign(a)

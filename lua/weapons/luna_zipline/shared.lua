@@ -3,8 +3,8 @@ SWEP.Author	= "AlicornLunaa"
 SWEP.Instructions = "Primary to launch and reel\nSecondary to expand\nReload to detach"
 
 SWEP.Spawnable = true
-SWEP.ViewModel = "models/weapons/v_pistol.mdl"
-SWEP.WorldModel = "models/weapons/w_pistol.mdl"
+SWEP.ViewModel = "models/weapons/v_smg1.mdl"
+SWEP.WorldModel = "models/weapons/w_smg1.mdl"
 
 SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = -1
@@ -17,7 +17,7 @@ SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
 
 -- Swep config
-SWEP.launchForce = 150000
+SWEP.launchForce = 10000000
 SWEP.maxDistance = 100000
 SWEP.reelSpeed = 4
 SWEP.pullForce = 0.12
@@ -44,8 +44,6 @@ function SWEP:Think()
     if SERVER then
         -- Get variables
         local isLaunched = self:GetNWBool("launched", false)
-        local reeling = self:GetNWBool("reeling", false)
-        local expanding = self:GetNWBool("expanding", false)
         local _hook = self:GetNWEntity("hook")
 
         -- Pull the player AND hook together
@@ -65,32 +63,6 @@ function SWEP:Think()
             local distanceForce = math.max(currentDistance - self:GetNWFloat("distance", 1) + math.Clamp(self:GetOwner():GetVelocity():Length(), -self.maxLerp, self.maxLerp) * distanceSign, 0)
             self:GetOwner():SetVelocity(ownerToHook * self.pullForce * distanceForce)
             _hook:GetPhysicsObject():ApplyForceCenter(hookToOwner * self.pullForce * 100 * distanceForce)
-        end
-
-        -- Reduce the targeted distance
-        if reeling then
-            local distance = self:GetNWFloat("distance", 1)
-            self:SetNWFloat("distance", math.Clamp(distance - self.reelSpeed, 1, self.maxDistance))
-
-            -- Check for a continuous hold of the reel button
-            if not self:GetOwner():KeyDown(IN_ATTACK) then
-                -- Primary attack was let go, stop reeling
-                self:SetNWBool("reeling", false)
-                self:StopSound("reel_sound")
-            end
-        end
-
-        -- Increase the targeted distance
-        if expanding then
-            local distance = self:GetNWFloat("distance", 1)
-            self:SetNWFloat("distance", math.Clamp(distance + self.reelSpeed, 1, self.maxDistance))
-
-            -- Check for a continuous hold of the reel button
-            if not self:GetOwner():KeyDown(IN_ATTACK2) then
-                -- Secondary attack was let go, stop expanding
-                self:SetNWBool("expanding", false)
-                self:StopSound("reel_sound")
-            end
         end
     end
 end
@@ -162,11 +134,7 @@ function SWEP:PrimaryAttack()
     local isLaunched = self:GetNWBool("launched", false)
 
     -- Run functions
-    if isLaunched then
-        -- Hook already launched, reel it in if its hooked.
-        self:SetNWBool("reeling", true)
-        self:EmitSound("reel_sound")
-    else
+    if !isLaunched then
         -- Hook has not been launched, launch it.
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
@@ -177,7 +145,7 @@ function SWEP:PrimaryAttack()
         if SERVER then
             -- Spawn the hook at hand and launch it in the look direction
             local viewModel = self:GetOwner():GetViewModel()
-            local attachmentPoint = self:GetAttachment(1)
+            local attachmentPoint = self:GetAttachment(2)
             local ent = ents.Create(self.hookClass)
             ent:SetPos(attachmentPoint.Pos + viewModel:GetForward() * ent.positionOffset.x)
             ent:SetAngles(viewModel:LocalToWorldAngles(ent.angleOffset))
@@ -199,18 +167,6 @@ function SWEP:PrimaryAttack()
                 end
             end )
         end
-    end
-end
-
-function SWEP:SecondaryAttack()
-    -- This function will cause the hook to expand
-    -- Get data
-    local isLaunched = self:GetNWBool("launched", false)
-
-    -- Serverside code
-    if isLaunched then
-        self:SetNWBool("expanding", true)
-        self:EmitSound("reel_sound")
     end
 end
 

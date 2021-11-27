@@ -26,35 +26,32 @@ SWEP.cableMaterial = Material("cable/cable2")
 SWEP.hookClass = "luna_hook_heavy"
 SWEP.weaponColor = Color(255, 255, 255)
 
--- Utility functions
-local function sign(a)
-    -- This function returns a -1 0 or 1 depending on the sign on the variable supplied
-    if a < 0 then
-        return -1
-    elseif a > 0 then
-        return 1
-    else
-        return 0
-    end
-end
-
 -- Functions
 function SWEP:Think()
     -- Serverside code
     if SERVER then
         -- Get variables
         local isLaunched = self:GetNWBool("launched", false)
+        local ply = self:GetOwner()
         local _start = self:GetNWEntity("start")
         local _hook = self:GetNWEntity("hook")
 
         -- Slide player along the rope
-        if isLaunched and _hook:IsValid() and self:GetOwner():IsValid() then
+        if isLaunched and _hook:IsValid() and _hook.attached and self:GetOwner():IsValid() then
             -- Get directions for hooks
+            local startPos = _start:LocalToWorld(Vector(0, 0, 52))
             local hookPos = _hook:LocalToWorld(_hook.attachPosition)
-            local ownerToHook = (hookPos - self:GetOwner():GetPos()):GetNormalized()
-            local hookToOwner = (self:GetOwner():GetPos() - hookPos):GetNormalized()
+            local newPos = LerpVector(self.distance, startPos, hookPos)
+            local plyPos = ply:GetPos() + Vector(0, 0, 70)
+            local deviance = newPos:GetNormalized():Dot(plyPos:GetNormalized())
+            print(deviance)
 
+            ply:SetVelocity((newPos - plyPos):GetNormalized() * (50 * deviance) - (ply:GetVelocity() * 0.05))
+            self.distance = self.distance + 0.001
 
+            if self.distance >= 1 then
+                self:Cleanup()
+            end
         end
     end
 end
@@ -97,8 +94,8 @@ function SWEP:Initialize()
     end
 end
 
-function SWEP:Reload()
-    -- Reload detaches the hook if its deployed
+function SWEP:Cleanup()
+    -- Detaches hook
     local isLaunched = self:GetNWBool("launched", false)
     local _start = self:GetNWEntity("start")
     local _hook = self:GetNWEntity("hook")
@@ -116,6 +113,11 @@ function SWEP:Reload()
             end
         end )
     end
+end
+
+function SWEP:Reload()
+    -- Reload detaches the hook if its deployed
+    self:Cleanup()
 end
 
 function SWEP:PrimaryAttack()
@@ -154,6 +156,8 @@ function SWEP:PrimaryAttack()
             self:SetNWEntity("hook", ent)
             self:SetNWEntity("start", ent2)
             self:SetNWBool("launched", true)
+
+            self.distance = 0
         end
     end
 end
@@ -203,5 +207,6 @@ end
 function SWEP:Holster()
     -- Weapon was holstered, fix colors
     self:GetOwner():GetViewModel():SetColor(Color(255, 255, 255))
+    self:Cleanup()
     return true
 end

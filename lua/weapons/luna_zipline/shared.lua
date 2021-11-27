@@ -1,6 +1,6 @@
 -- Swep info
 SWEP.Author	= "AlicornLunaa"
-SWEP.Instructions = "Primary to launch and reel\nSecondary to expand\nReload to detach"
+SWEP.Instructions = "Primary to launch\nReload to detach"
 
 SWEP.Spawnable = true
 SWEP.ViewModel = "models/weapons/v_smg1.mdl"

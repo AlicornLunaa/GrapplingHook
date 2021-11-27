@@ -169,7 +169,7 @@ function SWEP:ViewModelDrawn(ent)
         self.hookMdl:SetColor(self.weaponColor)
 
         -- Get location to attach to
-        if !_hook:IsValid() or !self.ropeAttached then
+        if !_hook:IsValid() then
             -- Draw hook on the gun because it's not launched
             cam.Start3D()
                 self.hookMdl:SetRenderOrigin(attachmentPoint.Pos - ent:GetForward() * self.hookMdl.positionOffset.x)
@@ -190,7 +190,7 @@ function SWEP:DrawWorldModel(flags)
         local _hook = self:GetNWEntity("hook")
 
         -- Get location to attach to
-        if (!_hook:IsValid() or !self.ropeAttached) and self.hookMdl:IsValid() and attachmentPoint then
+        if !_hook:IsValid() and self.hookMdl:IsValid() and attachmentPoint then
             -- Draw the hook since there is none launched
             local pos, ang = LocalToWorld(Vector(-8, -0.5, 0), self.hookMdl.angleOffset, attachmentPoint.Pos, attachmentPoint.Ang)
             self.hookMdl:SetRenderOrigin(pos)

@@ -44,7 +44,6 @@ function SWEP:Think()
             local newPos = LerpVector(self.distance, startPos, hookPos)
             local plyPos = ply:GetPos() + Vector(0, 0, 70)
             local deviance = newPos:GetNormalized():Dot(plyPos:GetNormalized())
-            print(deviance)
 
             ply:SetVelocity((newPos - plyPos):GetNormalized() * (50 * deviance) - (ply:GetVelocity() * 0.05))
             self.distance = self.distance + 0.001

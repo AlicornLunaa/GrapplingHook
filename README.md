@@ -34,3 +34,9 @@ Assorted grappling hooks for the game Garry's Mod.
         - Primary fire launches and reels
         - Secondary fire expands the reel
         - Reload detaches
+        
+    - Zipline
+        - Sticks to surfaces
+        - Primary fire launches
+        - Sliding starts immediately after hooking
+        - Reload detaches

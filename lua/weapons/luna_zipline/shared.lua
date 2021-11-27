@@ -17,7 +17,7 @@ SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
 
 -- Swep config
-SWEP.launchForce = 10000000
+SWEP.launchForce = 6000000
 SWEP.maxDistance = 100000
 SWEP.reelSpeed = 4
 SWEP.pullForce = 0.12
@@ -44,25 +44,17 @@ function SWEP:Think()
     if SERVER then
         -- Get variables
         local isLaunched = self:GetNWBool("launched", false)
+        local _start = self:GetNWEntity("start")
         local _hook = self:GetNWEntity("hook")
 
-        -- Pull the player AND hook together
+        -- Slide player along the rope
         if isLaunched and _hook:IsValid() and self:GetOwner():IsValid() then
             -- Get directions for hooks
             local hookPos = _hook:LocalToWorld(_hook.attachPosition)
             local ownerToHook = (hookPos - self:GetOwner():GetPos()):GetNormalized()
             local hookToOwner = (self:GetOwner():GetPos() - hookPos):GetNormalized()
 
-            -- Get a variable to check if theyre moving towards or away the hook
-            local currentDistance = self:GetOwner():GetPos():Distance(hookPos)
-            local deltaDistance = currentDistance - self:GetNWFloat("lastDistance", 1)
-            local distanceSign = sign(deltaDistance)
-            self:SetNWFloat("lastDistance", currentDistance)
 
-            -- Forces for hooks and player
-            local distanceForce = math.max(currentDistance - self:GetNWFloat("distance", 1) + math.Clamp(self:GetOwner():GetVelocity():Length(), -self.maxLerp, self.maxLerp) * distanceSign, 0)
-            self:GetOwner():SetVelocity(ownerToHook * self.pullForce * distanceForce)
-            _hook:GetPhysicsObject():ApplyForceCenter(hookToOwner * self.pullForce * 100 * distanceForce)
         end
     end
 end
@@ -108,6 +100,7 @@ end
 function SWEP:Reload()
     -- Reload detaches the hook if its deployed
     local isLaunched = self:GetNWBool("launched", false)
+    local _start = self:GetNWEntity("start")
     local _hook = self:GetNWEntity("hook")
 
     if isLaunched then
@@ -115,11 +108,10 @@ function SWEP:Reload()
         self:SetNWBool("launched", false)
         self:EmitSound("release_sound")
 
-        self.ropeAttached = false
-
         timer.Simple(3, function()
             -- Only server can remove the hook
             if SERVER and _hook:IsValid() then
+                _start:Remove()
                 _hook:Remove()
             end
         end )
@@ -139,8 +131,6 @@ function SWEP:PrimaryAttack()
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
-        self.ropeAttached = true
-
         -- Serverside only
         if SERVER then
             -- Spawn the hook at hand and launch it in the look direction
@@ -153,19 +143,17 @@ function SWEP:PrimaryAttack()
             ent:Spawn()
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 
+            -- Create the starting point
+            local ent2 = ents.Create("luna_zipline_start")
+            ent2:SetPos(self:GetOwner():GetPos() + Vector(0, 0, 30))
+            ent2:SetAngles(Angle(0, 0, 0))
+            ent2:SetOwner(self:GetOwner())
+            ent2:SetNWEntity("hook", ent)
+            ent2:Spawn()
+
             self:SetNWEntity("hook", ent)
-
-            -- Setup the launch function to activate once the key is released
-            hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
-                if key == IN_ATTACK then
-                    local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
-                    self:SetNWFloat("lastDistance", distance)
-                    self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
-                    self:SetNWBool("launched", true)
-
-                    hook.Remove("KeyRelease", "hookLaunchActive")
-                end
-            end )
+            self:SetNWEntity("start", ent2)
+            self:SetNWBool("launched", true)
         end
     end
 end
@@ -181,14 +169,7 @@ function SWEP:ViewModelDrawn(ent)
         self.hookMdl:SetColor(self.weaponColor)
 
         -- Get location to attach to
-        if _hook:IsValid() and self.ropeAttached then
-            _hook:SetColor(self.weaponColor)
-
-            cam.Start3D()
-                render.SetMaterial(self.cableMaterial)
-                render.DrawBeam(attachmentPoint.Pos, _hook:LocalToWorld(_hook.attachPosition), 1, 1, 1, Color(255, 255, 255))
-            cam.End3D()
-        else
+        if !_hook:IsValid() or !self.ropeAttached then
             -- Draw hook on the gun because it's not launched
             cam.Start3D()
                 self.hookMdl:SetRenderOrigin(attachmentPoint.Pos - ent:GetForward() * self.hookMdl.positionOffset.x)
@@ -209,10 +190,7 @@ function SWEP:DrawWorldModel(flags)
         local _hook = self:GetNWEntity("hook")
 
         -- Get location to attach to
-        if _hook:IsValid() and self.ropeAttached then
-            render.SetMaterial(self.cableMaterial)
-            render.DrawBeam(attachmentPoint.Pos, _hook:LocalToWorld(self.hookMdl.attachPosition), 1, 1, 1, Color(255, 255, 255))
-        elseif self.hookMdl:IsValid() and attachmentPoint then
+        if (!_hook:IsValid() or !self.ropeAttached) and self.hookMdl:IsValid() and attachmentPoint then
             -- Draw the hook since there is none launched
             local pos, ang = LocalToWorld(Vector(-8, -0.5, 0), self.hookMdl.angleOffset, attachmentPoint.Pos, attachmentPoint.Ang)
             self.hookMdl:SetRenderOrigin(pos)

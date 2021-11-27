@@ -30,4 +30,12 @@ function ENT:Draw()
         ang:RotateAroundAxis(Vector(0, 0, 1), 120)
         pos:Rotate(Angle(0, 120, 0))
     end
+
+    -- Draw beam
+    local _hook = self:GetNWEntity("hook")
+
+    if _hook:IsValid() then
+        render.SetMaterial(self.cableMaterial)
+        render.DrawBeam(self:LocalToWorld(Vector(0, 0, 52)), _hook:LocalToWorld(_hook.attachPosition), 3, 1, 1, Color(255, 255, 255))
+    end
 end

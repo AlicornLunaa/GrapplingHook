@@ -9,4 +9,4 @@ ENT.Spawnable = false
 ENT.DisableDuplicator = true
 ENT.DoNotDuplicate = true
 
-ENT.attachPoint = Vector(0, 0, 33)
+ENT.cableMaterial = Material("cable/cable2")

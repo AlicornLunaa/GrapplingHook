@@ -138,12 +138,12 @@ function SWEP:Reload()
     local isLaunched = self:GetNWBool("launched", false)
     local _hook = self:GetNWEntity("hook")
 
+    self.ropeAttached = false
+
     if isLaunched then
         -- Hook exists, remove it after 3 seconds and also detach it within code
         self:SetNWBool("launched", false)
         self:EmitSound("release_sound")
-
-        self.ropeAttached = false
 
         timer.Simple(3, function()
             -- Only server can remove the hook
@@ -235,8 +235,11 @@ function SWEP:ViewModelDrawn(ent)
         else
             -- Draw hook on the gun because it's not launched
             cam.Start3D()
-                self.hookMdl:SetRenderOrigin(attachmentPoint.Pos - ent:GetForward() * self.hookMdl.positionOffset.x)
-                self.hookMdl:SetRenderAngles(ent:LocalToWorldAngles(self.hookMdl.angleOffset))
+                local pos, ang = LocalToWorld(self.hookMdl.positionOffset, self.hookMdl.angleOffset + Angle(-10, 90, 90), attachmentPoint.Pos, attachmentPoint.Ang)
+                self.hookMdl:SetRenderOrigin(pos)
+                self.hookMdl:SetRenderAngles(ang)
+                self.hookMdl:SetPos(pos)
+                self.hookMdl:SetAngles(ang)
                 self.hookMdl:DrawModel()
             cam.End3D()
         end
@@ -258,9 +261,11 @@ function SWEP:DrawWorldModel(flags)
             render.DrawBeam(attachmentPoint.Pos, _hook:LocalToWorld(self.hookMdl.attachPosition), 1, 1, 1, Color(255, 255, 255))
         elseif self.hookMdl:IsValid() and attachmentPoint then
             -- Draw the hook since there is none launched
-            local pos, ang = LocalToWorld(Vector(-8, -0.5, 0), self.hookMdl.angleOffset, attachmentPoint.Pos, attachmentPoint.Ang)
+            local pos, ang = LocalToWorld(self.hookMdl.positionOffset, self.hookMdl.angleOffset, attachmentPoint.Pos, attachmentPoint.Ang)
             self.hookMdl:SetRenderOrigin(pos)
             self.hookMdl:SetRenderAngles(ang)
+            self.hookMdl:SetPos(pos)
+            self.hookMdl:SetAngles(ang)
             self.hookMdl:DrawModel()
         end
     end

@@ -175,8 +175,11 @@ function SWEP:ViewModelDrawn(ent)
         if !_hook:IsValid() then
             -- Draw hook on the gun because it's not launched
             cam.Start3D()
-                self.hookMdl:SetRenderOrigin(attachmentPoint.Pos - ent:GetForward() * self.hookMdl.positionOffset.x)
-                self.hookMdl:SetRenderAngles(ent:LocalToWorldAngles(self.hookMdl.angleOffset))
+                local pos, ang = LocalToWorld(self.hookMdl.positionOffset, self.hookMdl.angleOffset, attachmentPoint.Pos, attachmentPoint.Ang)
+                self.hookMdl:SetRenderOrigin(pos)
+                self.hookMdl:SetRenderAngles(ang)
+                self.hookMdl:SetPos(pos)
+                self.hookMdl:SetAngles(ang)
                 self.hookMdl:DrawModel()
             cam.End3D()
         end
@@ -195,9 +198,11 @@ function SWEP:DrawWorldModel(flags)
         -- Get location to attach to
         if !_hook:IsValid() and self.hookMdl:IsValid() and attachmentPoint then
             -- Draw the hook since there is none launched
-            local pos, ang = LocalToWorld(Vector(-8, -0.5, 0), self.hookMdl.angleOffset, attachmentPoint.Pos, attachmentPoint.Ang)
+            local pos, ang = LocalToWorld(self.hookMdl.positionOffset, self.hookMdl.angleOffset, attachmentPoint.Pos, attachmentPoint.Ang)
             self.hookMdl:SetRenderOrigin(pos)
             self.hookMdl:SetRenderAngles(ang)
+            self.hookMdl:SetPos(pos)
+            self.hookMdl:SetAngles(ang)
             self.hookMdl:DrawModel()
         end
     end

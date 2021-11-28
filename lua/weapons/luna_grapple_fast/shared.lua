@@ -30,7 +30,7 @@ function SWEP:Think()
     -- Serverside code
     if SERVER then
         -- Only run when the game is running
-        if gameUIVisible then return end
+        if game.SinglePlayer() and gameUIVisible then return end
 
         -- Get variables
         local launched = self:GetNWBool("launched", false)

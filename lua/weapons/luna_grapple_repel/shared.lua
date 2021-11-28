@@ -102,3 +102,6 @@ function SWEP:PrimaryAttack()
         end
     end
 end
+
+function SWEP:SecondaryAttack()
+end

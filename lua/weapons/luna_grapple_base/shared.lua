@@ -220,7 +220,8 @@ function SWEP:ViewModelDrawn(ent)
     if CLIENT then
         -- Draw the beam for the viewmodel
         -- Get networked information
-        local attachmentPoint = self:GetOwner():GetViewModel():GetAttachment(1)
+        local vm = self:GetOwner():GetViewModel()
+        local attachmentPoint = vm:GetAttachment(1)
         local _hook = self:GetNWEntity("hook")
 
         ent:SetColor(self.weaponColor)
@@ -277,4 +278,8 @@ function SWEP:Holster()
     -- Weapon was holstered, fix colors
     self:GetOwner():GetViewModel():SetColor(Color(255, 255, 255))
     return true
+end
+
+function SWEP:OnRemove()
+    self:Holster()
 end

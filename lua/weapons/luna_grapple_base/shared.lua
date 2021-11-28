@@ -136,8 +136,8 @@ function SWEP:Initialize()
     end
 end
 
-function SWEP:Reload()
-    -- Reload detaches the hook if its deployed
+function SWEP:Cleanup()
+    -- Detaches the hook
     local isLaunched = self:GetNWBool("launched", false)
     local _hook = self:GetNWEntity("hook")
 
@@ -155,6 +155,11 @@ function SWEP:Reload()
             end
         end )
     end
+end
+
+function SWEP:Reload()
+    -- Reload detaches the hook if its deployed
+    self:Cleanup()
 end
 
 function SWEP:PrimaryAttack()
@@ -276,6 +281,7 @@ end
 
 function SWEP:Holster()
     -- Weapon was holstered, fix colors
+    self:Cleanup()
     self:GetOwner():GetViewModel():SetColor(Color(255, 255, 255))
     return true
 end

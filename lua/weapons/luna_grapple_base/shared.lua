@@ -42,6 +42,9 @@ end
 function SWEP:Think()
     -- Serverside code
     if SERVER then
+        -- Only run when the game is running
+        if gameUIVisible then return end
+
         -- Get variables
         local isLaunched = self:GetNWBool("launched", false)
         local reeling = self:GetNWBool("reeling", false)

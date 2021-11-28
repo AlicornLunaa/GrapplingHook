@@ -30,6 +30,9 @@ SWEP.weaponColor = Color(255, 255, 255)
 function SWEP:Think()
     -- Serverside code
     if SERVER then
+        -- Skip if game is paused in singleplayer to avoid launch glitch
+        if gameUIVisible then return end
+
         -- Get variables
         local isLaunched = self:GetNWBool("launched", false)
         local ply = self:GetOwner()

@@ -141,7 +141,7 @@ function SWEP:Reload()
     local isLaunched = self:GetNWBool("launched", false)
     local _hook = self:GetNWEntity("hook")
 
-    self.ropeAttached = false
+    self:SetNWBool("ropeAttached", false)
 
     if isLaunched then
         -- Hook exists, remove it after 3 seconds and also detach it within code
@@ -174,8 +174,6 @@ function SWEP:PrimaryAttack()
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
-        self.ropeAttached = true
-
         -- Serverside only
         if SERVER then
             -- Spawn the hook at hand and launch it in the look direction
@@ -189,6 +187,7 @@ function SWEP:PrimaryAttack()
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 
             self:SetNWEntity("hook", ent)
+            self:SetNWBool("ropeAttached", true)
 
             -- Setup the launch function to activate once the key is released
             hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
@@ -228,7 +227,7 @@ function SWEP:ViewModelDrawn(ent)
         self.hookMdl:SetColor(self.weaponColor)
 
         -- Get location to attach to
-        if _hook:IsValid() and self.ropeAttached then
+        if _hook:IsValid() and self:GetNWBool("ropeAttached", false) then
             _hook:SetColor(self.weaponColor)
 
             cam.Start3D()
@@ -259,7 +258,7 @@ function SWEP:DrawWorldModel(flags)
         local _hook = self:GetNWEntity("hook")
 
         -- Get location to attach to
-        if _hook:IsValid() and self.ropeAttached then
+        if _hook:IsValid() and self:GetNWBool("ropeAttached", false) then
             render.SetMaterial(self.cableMaterial)
             render.DrawBeam(attachmentPoint.Pos, _hook:LocalToWorld(self.hookMdl.attachPosition), 1, 1, 1, Color(255, 255, 255))
         elseif self.hookMdl:IsValid() and attachmentPoint then

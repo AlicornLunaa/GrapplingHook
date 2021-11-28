@@ -72,7 +72,7 @@ function SWEP:PrimaryAttack()
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
-        self.ropeAttached = true
+        self:SetNWBool("ropeAttached", true)
 
         -- Serverside only
         if SERVER then

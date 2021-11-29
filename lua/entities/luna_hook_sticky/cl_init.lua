@@ -40,3 +40,10 @@ function ENT:Draw()
     self.plungerMdl:SetRenderAngles(self:LocalToWorldAngles(Angle(0, 0, 0)))
     self.plungerMdl:DrawModel()
 end
+
+
+function ENT:OnRemove()
+    -- This function removes the fake models, as a garbage collection
+    self.handleMdl:Remove()
+    self.plungerMdl:Remove()
+end

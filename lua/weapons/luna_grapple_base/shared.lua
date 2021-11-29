@@ -107,7 +107,6 @@ function SWEP:Initialize()
 
         self.hookMdl = ent
     end
-    print("A")
 end
 
 function SWEP:Cleanup()
@@ -115,21 +114,20 @@ function SWEP:Cleanup()
     local isLaunched = self:GetNWBool("launched", false)
     local _hook = self:GetNWEntity("hook")
 
-    self:SetNWBool("ropeAttached", false)
+    -- Hook exists, remove it after 3 seconds and also detach it within code
+    if isLaunched then self:EmitSound("release_sound") end
+
     self:StopSound("reel_sound")
+    self:SetNWBool("ropeAttached", false)
+    self:SetNWBool("launched", false)
+    self:SetNWEntity("hook", nil)
 
-    if isLaunched then
-        -- Hook exists, remove it after 3 seconds and also detach it within code
-        self:SetNWBool("launched", false)
-        self:EmitSound("release_sound")
-
-        timer.Simple(3, function()
-            -- Only server can remove the hook
-            if SERVER and _hook:IsValid() then
-                _hook:Remove()
-            end
-        end )
-    end
+    timer.Simple(3, function()
+        -- Only server can remove the hook
+        if SERVER and _hook:IsValid() then
+            _hook:Remove()
+        end
+    end )
 end
 
 function SWEP:Reload()
@@ -154,6 +152,7 @@ function SWEP:PrimaryAttack()
         self:EmitSound("reel_sound")
     else
         -- Hook has not been launched, launch it.
+        self:SetNextPrimaryFire(CurTime() + 0.2)
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 

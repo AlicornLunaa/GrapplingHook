@@ -75,19 +75,18 @@ function SWEP:Cleanup()
     local _start = self:GetNWEntity("start")
     local _hook = self:GetNWEntity("hook")
 
-    if isLaunched then
-        -- Hook exists, remove it after 3 seconds and also detach it within code
-        self:SetNWBool("launched", false)
-        self:EmitSound("release_sound")
+    -- Hook exists, remove it after 3 seconds and also detach it within code
+    if isLaunched then self:EmitSound("release_sound") end
 
-        timer.Simple(3, function()
-            -- Only server can remove the hook
-            if SERVER then
-                if _start:IsValid() then _start:Remove() end
-                if _hook:IsValid() then _hook:Remove() end
-            end
-        end )
-    end
+    self:SetNWBool("launched", false)
+
+    timer.Simple(3, function()
+        -- Only server can remove the hook
+        if SERVER then
+            if _start:IsValid() then _start:Remove() end
+            if _hook:IsValid() then _hook:Remove() end
+        end
+    end )
 end
 
 function SWEP:Reload()

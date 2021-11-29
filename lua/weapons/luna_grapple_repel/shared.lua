@@ -73,6 +73,7 @@ function SWEP:PrimaryAttack()
     -- Run functions
     if !isLaunched then
         -- Hook has not been launched, launch it.
+        self:SetNextPrimaryFire(CurTime() + 0.2)
         self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 

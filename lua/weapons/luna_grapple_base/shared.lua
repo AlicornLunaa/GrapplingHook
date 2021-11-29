@@ -43,6 +43,7 @@ function SWEP:Think()
     -- Serverside code
     if SERVER then
         -- Only run when the game is running
+        if !self:IsValid() then return end
         if game.SinglePlayer() and gameUIVisible then return end
 
         -- Get variables
@@ -71,12 +72,12 @@ function SWEP:Think()
         end
 
         -- Reduce the targeted distance
-        if reeling then
+        if reeling and self:GetOwner():IsValid() then
             local distance = self:GetNWFloat("distance", 1)
             self:SetNWFloat("distance", math.Clamp(distance - self.reelSpeed, 1, self.maxDistance))
 
             -- Check for a continuous hold of the reel button
-            if not self:GetOwner():KeyDown(IN_ATTACK) then
+            if !self:GetOwner():KeyDown(IN_ATTACK) then
                 -- Primary attack was let go, stop reeling
                 self:SetNWBool("reeling", false)
                 self:StopSound("reel_sound")
@@ -84,12 +85,12 @@ function SWEP:Think()
         end
 
         -- Increase the targeted distance
-        if expanding then
+        if expanding and self:GetOwner():IsValid() then
             local distance = self:GetNWFloat("distance", 1)
             self:SetNWFloat("distance", math.Clamp(distance + self.reelSpeed, 1, self.maxDistance))
 
             -- Check for a continuous hold of the reel button
-            if not self:GetOwner():KeyDown(IN_ATTACK2) then
+            if !self:GetOwner():KeyDown(IN_ATTACK2) then
                 -- Secondary attack was let go, stop expanding
                 self:SetNWBool("expanding", false)
                 self:StopSound("reel_sound")
@@ -99,34 +100,6 @@ function SWEP:Think()
 end
 
 function SWEP:Initialize()
-    -- Create sounds
-    sound.Add({
-        name = "firing_sound",
-        channel = CHAN_STATIC,
-        volume = 1.0,
-        level = 60,
-        pitch = { 80, 100 },
-        sound = "ambient/materials/clang1.wav"
-    })
-
-    sound.Add({
-        name = "release_sound",
-        channel = CHAN_STATIC,
-        volume = 1.0,
-        level = 60,
-        pitch = { 80, 100 },
-        sound = "ambient/tones/elev2.wav"
-    })
-
-    sound.Add({
-        name = "reel_sound",
-        channel = CHAN_STATIC,
-        volume = 1.0,
-        level = 80,
-        pitch = 100,
-        sound = "ambient/tones/fan2_loop.wav"
-    })
-
     -- Create model to render on gun
     if CLIENT then
         local ent = ents.CreateClientside(self.hookClass)
@@ -167,6 +140,9 @@ function SWEP:PrimaryAttack()
     -- This function will launch the hook and wait for it to grapple
     -- or it will reel the grapple in depending on the status of it
     -- Store data in variables
+    if !self:GetOwner():IsValid() then return end
+
+    -- Save data
     local lookDirection = self:GetOwner():GetAimVector()
     local isLaunched = self:GetNWBool("launched", false)
 
@@ -197,14 +173,15 @@ function SWEP:PrimaryAttack()
 
             -- Setup the launch function to activate once the key is released
             hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
-                if key == IN_ATTACK then
+                if key == IN_ATTACK and self:IsValid() and self:GetOwner():IsValid() then
                     local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+
                     self:SetNWFloat("lastDistance", distance)
                     self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
                     self:SetNWBool("launched", true)
-
-                    hook.Remove("KeyRelease", "hookLaunchActive")
                 end
+
+                hook.Remove("KeyRelease", "hookLaunchActive")
             end )
         end
     end
@@ -226,6 +203,9 @@ function SWEP:ViewModelDrawn(ent)
     if CLIENT then
         -- Draw the beam for the viewmodel
         -- Get networked information
+        if !self:GetOwner():IsValid() or !ent:IsValid() or !self.hookMdl:IsValid() then return end
+
+        -- Save data
         local vm = self:GetOwner():GetViewModel()
         local attachmentPoint = vm:GetAttachment(1)
         local _hook = self:GetNWEntity("hook")
@@ -293,4 +273,5 @@ end
 
 function SWEP:OnRemove()
     self:Holster()
+    self.hookMdl:Remove()
 end

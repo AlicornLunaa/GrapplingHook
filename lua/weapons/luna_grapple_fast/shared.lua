@@ -30,6 +30,7 @@ function SWEP:Think()
     -- Serverside code
     if SERVER then
         -- Only run when the game is running
+        if !self:IsValid() then return end
         if game.SinglePlayer() and gameUIVisible then return end
 
         -- Get variables
@@ -57,7 +58,7 @@ function SWEP:Think()
         end
 
         -- Check for a continuous hold of the reel button
-        if not self:GetOwner():KeyDown(IN_ATTACK) and launched then
+        if !self:GetOwner():KeyDown(IN_ATTACK) and launched then
             -- Hook exists, remove it after 3 seconds and also detach it within code
             self:SetNWBool("launched", false)
             self:EmitSound("release_sound")

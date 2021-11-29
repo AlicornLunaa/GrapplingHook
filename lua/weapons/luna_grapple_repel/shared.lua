@@ -31,6 +31,7 @@ function SWEP:Think()
     -- Serverside code
     if SERVER then
         -- Only run when the game is running
+        if !self:IsValid() then return end
         if game.SinglePlayer() and gameUIVisible then return end
 
         -- Get variables
@@ -63,6 +64,9 @@ function SWEP:PrimaryAttack()
     -- This function will launch the hook and wait for it to grapple
     -- or it will reel the grapple in depending on the status of it
     -- Store data in variables
+    if !self:GetOwner():IsValid() then return end
+
+    -- Save data
     local lookDirection = self:GetOwner():GetAimVector()
     local isLaunched = self:GetNWBool("launched", false)
 
@@ -90,14 +94,15 @@ function SWEP:PrimaryAttack()
 
             -- Setup the launch function to activate once the key is released
             hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
-                if key == IN_ATTACK then
+                if key == IN_ATTACK and self:GetOwner():IsValid() then
                     local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+
                     self:SetNWFloat("lastDistance", distance)
                     self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
                     self:SetNWBool("launched", true)
-
-                    hook.Remove("KeyRelease", "hookLaunchActive")
                 end
+
+                hook.Remove("KeyRelease", "hookLaunchActive")
             end )
         end
     end

@@ -41,9 +41,8 @@ function ENT:Draw()
     self.plungerMdl:DrawModel()
 end
 
-
 function ENT:OnRemove()
     -- This function removes the fake models, as a garbage collection
-    self.handleMdl:Remove()
-    self.plungerMdl:Remove()
+    if self.handleMdl and self.handleMdl:IsValid() then self.handleMdl:Remove() end
+    if self.plungerMdl and self.plungerMdl:IsValid() then self.plungerMdl:Remove() end
 end

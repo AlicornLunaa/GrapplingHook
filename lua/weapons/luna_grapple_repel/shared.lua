@@ -88,6 +88,7 @@ function SWEP:PrimaryAttack()
             ent:SetAngles(viewModel:LocalToWorldAngles(ent.angleOffset))
             ent:SetOwner(self:GetOwner())
             ent:Spawn()
+            ent:SetColor(self.weaponColor)
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 
             self:SetNWEntity("hook", ent)

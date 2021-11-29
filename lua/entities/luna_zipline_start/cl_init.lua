@@ -42,5 +42,5 @@ end
 
 function ENT:OnRemove()
     -- Run GC on clientside models
-    self.tripodMdl:Remove()
+    if self.tripodMdl and self.tripodMdl:IsValid() then self.tripodMdl:Remove() end
 end

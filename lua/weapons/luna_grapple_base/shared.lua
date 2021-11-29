@@ -107,6 +107,7 @@ function SWEP:Initialize()
 
         self.hookMdl = ent
     end
+    print("A")
 end
 
 function SWEP:Cleanup()
@@ -166,6 +167,7 @@ function SWEP:PrimaryAttack()
             ent:SetAngles(viewModel:LocalToWorldAngles(ent.angleOffset))
             ent:SetOwner(self:GetOwner())
             ent:Spawn()
+            ent:SetColor(self.weaponColor)
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 
             self:SetNWEntity("hook", ent)
@@ -272,6 +274,6 @@ function SWEP:Holster()
 end
 
 function SWEP:OnRemove()
+    if CLIENT and self.hookMdl:IsValid() then self.hookMdl:Remove() end
     self:Holster()
-    self.hookMdl:Remove()
 end

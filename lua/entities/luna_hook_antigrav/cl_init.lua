@@ -43,6 +43,6 @@ end
 
 function ENT:OnRemove()
     -- This function removes the fake models, as a garbage collection
-    self.baseMdl:Remove()
-    self.hookMdl:Remove()
+    if self.handleMdl:IsValid() then self.handleMdl:Remove() end
+    if self.plungerMdl:IsValid() then self.plungerMdl:Remove() end
 end

@@ -109,9 +109,9 @@ function SWEP:Cleanup()
 
         timer.Simple(3, function()
             -- Only server can remove the hook
-            if SERVER and _hook:IsValid() then
-                _start:Remove()
-                _hook:Remove()
+            if SERVER then
+                if _start:IsValid() then _start:Remove() end
+                if _hook:IsValid() then _hook:Remove() end
             end
         end )
     end
@@ -220,4 +220,8 @@ function SWEP:Holster()
     end
 
     return true
+end
+
+function SWEP:OnRemove()
+    self:Holster()
 end

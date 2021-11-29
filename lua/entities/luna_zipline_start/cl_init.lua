@@ -39,3 +39,8 @@ function ENT:Draw()
         render.DrawBeam(self:LocalToWorld(Vector(0, 0, 52)), _hook:LocalToWorld(_hook.attachPosition), 3, 1, 1, Color(255, 255, 255))
     end
 end
+
+function ENT:OnRemove()
+    -- Run GC on clientside models
+    self.tripodMdl:Remove()
+end

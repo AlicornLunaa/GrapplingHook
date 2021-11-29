@@ -50,3 +50,9 @@ function ENT:Draw()
         pos:Rotate(Angle(0, 120, 0))
     end
 end
+
+function ENT:OnRemove()
+    -- This function removes the fake models, as a garbage collection
+    self.baseMdl:Remove()
+    self.hookMdl:Remove()
+end

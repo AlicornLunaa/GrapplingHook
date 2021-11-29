@@ -142,6 +142,7 @@ function SWEP:Cleanup()
     local _hook = self:GetNWEntity("hook")
 
     self:SetNWBool("ropeAttached", false)
+    self:StopSound("reel_sound")
 
     if isLaunched then
         -- Hook exists, remove it after 3 seconds and also detach it within code

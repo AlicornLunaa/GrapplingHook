@@ -213,7 +213,11 @@ end
 
 function SWEP:Holster()
     -- Weapon was holstered, fix colors
-    self:GetOwner():GetViewModel():SetColor(Color(255, 255, 255))
     self:Cleanup()
+
+    if self:IsValid() and self:GetOwner():IsValid() and self:GetOwner():GetViewModel():IsValid() then
+        self:GetOwner():GetViewModel():SetColor(Color(255, 255, 255))
+    end
+
     return true
 end

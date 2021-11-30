@@ -36,7 +36,7 @@ function SWEP:Think()
 
         -- Reduce the targeted distance
         if reeling and self:GetOwner():IsValid() then
-            self.hook.currentDistance = math.Clamp(self.hook.currentDistance - self.reelSpeed, 1, self.hook.maxDistance)
+            self.hook.targetDistance = math.Clamp(self.hook.targetDistance - self.reelSpeed, 1, self.hook.maxDistance)
 
             -- Check for a continuous hold of the reel button
             if !self:GetOwner():KeyDown(IN_ATTACK) then
@@ -48,7 +48,7 @@ function SWEP:Think()
 
         -- Increase the targeted distance
         if expanding and self:GetOwner():IsValid() then
-            self.hook.currentDistance = math.Clamp(self.hook.currentDistance + self.reelSpeed, 1, self.hook.maxDistance)
+            self.hook.targetDistance = math.Clamp(self.hook.targetDistance + self.reelSpeed, 1, self.hook.maxDistance)
 
             -- Check for a continuous hold of the reel button
             if !self:GetOwner():KeyDown(IN_ATTACK2) then
@@ -126,9 +126,9 @@ function SWEP:PrimaryAttack()
             ent:SetHookLauncher(self:GetOwner())
             ent:SetColor(self.weaponColor)
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
-            self.hook = ent
 
-            self:SetNWBool("ropeAttached", true)
+            self.hook = ent
+            self:SetNWEntity("hook", ent)
 
             -- Setup the launch function to activate once the key is released
             hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
@@ -136,7 +136,7 @@ function SWEP:PrimaryAttack()
                     local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
 
                     ent.lastDistance = math.Clamp(distance, 1, ent.maxDistance)
-                    ent.currentDistance = math.Clamp(distance, 1, ent.maxDistance)
+                    ent.targetDistance = math.Clamp(distance, 1, ent.maxDistance)
                     ent:SetHookAttached(true)
                 end
 
@@ -163,12 +163,13 @@ function SWEP:ViewModelDrawn(ent)
         -- Save data
         local vm = self:GetOwner():GetViewModel()
         local attachmentPoint = vm:GetAttachment(1)
+        local _hook = self:GetNWEntity("hook", NULL)
 
         ent:SetColor(self.weaponColor)
         self.hookMdl:SetColor(self.weaponColor)
 
         -- Get location to attach to
-        if true then
+        if !_hook:IsValid() or !_hook:GetHookAttached() then
             -- Draw hook on the gun because it's not launched
             cam.Start3D()
                 local pos, ang = LocalToWorld(self.hookMdl.positionOffset, self.hookMdl.angleOffset + Angle(-10, 90, 90), attachmentPoint.Pos, attachmentPoint.Ang)

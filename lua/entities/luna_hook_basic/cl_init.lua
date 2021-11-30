@@ -60,18 +60,21 @@ function ENT:Draw()
         local vm = ply:GetViewModel()
 
         -- Get the position to draw to
-        local boneTransform = wep:GetAttachment(1)
+        if wep:IsValid() then
+            local boneTransform = wep:GetAttachment(1)
 
-        -- Fix position if its being rendered to the viewmodel
-        if vm:IsValid() and wep:IsValid() and wep:IsCarriedByLocalPlayer() and ply:GetViewEntity() == ply then
-            boneTransform = vm:GetAttachment(1)
+            -- Fix position if its being rendered to the viewmodel
+            if vm:IsValid() and wep:IsCarriedByLocalPlayer() and ply:GetViewEntity() == ply then
+                boneTransform = vm:GetAttachment(1)
+            end
+
+            -- Draw the actual beam
+            self:SetRenderBoundsWS(self:GetPos(), ply:GetPos(), Vector(8, 8, 8))
+            cam.Start3D()
+                render.SetMaterial(self.cableMaterial)
+                render.DrawBeam(self:LocalToWorld(self.attachPosition), boneTransform.Pos, 1, 1, 1, Color(255, 255, 255))
+            cam.End3D()
         end
-
-        -- Draw the actual beam
-        cam.Start3D()
-            render.SetMaterial(self.cableMaterial)
-            render.DrawBeam(self:LocalToWorld(self.attachPosition), boneTransform.Pos, 1, 1, 1, Color(255, 255, 255))
-        cam.End3D()
     end
 end
 

@@ -1,7 +1,6 @@
 -- Entity information
 ENT.Type = "anim"
 ENT.Base = "base_gmodentity"
-
 ENT.PrintName = "Basic hook"
 ENT.Author = "AlicornLunaa"
 
@@ -9,6 +8,7 @@ ENT.Spawnable = false
 ENT.DisableDuplicator = true
 ENT.DoNotDuplicate = true
 
+-- Render config
 ENT.attachPosition = Vector(0, 0, 0)
 ENT.positionOffset = Vector(-8, -0.5, 0)
 ENT.angleOffset = Angle(90, 0, 0)
@@ -93,4 +93,8 @@ function ENT:Think()
     if physObj:IsValid() and self.hookAttached then
         self:ForceCalculation(physObj)
     end
+
+    -- Think faster
+    self:NextThink(CurTime())
+    return true
 end

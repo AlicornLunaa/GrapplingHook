@@ -39,5 +39,5 @@ end
 -- Net messages
 net.Receive("luna:grapple:uiVisibleChanged", function(len, ply)
     -- Change the serverside variable
-    gameUIVisible = net.ReadBool()
+    luna.gameUIVisible = net.ReadBool()
 end )

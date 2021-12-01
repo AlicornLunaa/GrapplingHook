@@ -1,5 +1,6 @@
 -- Swep info
 SWEP.Base = "luna_grapple_repel"
+SWEP.Spawnable = true
 
 -- Swep config
 SWEP.launchForce = 85000

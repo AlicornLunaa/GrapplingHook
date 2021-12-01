@@ -1,6 +1,7 @@
 -- Swep info
 SWEP.Base = "luna_grapple_basic"
 SWEP.Instructions = "Primary to launch\nRelease to detach"
+SWEP.Spawnable = true
 
 -- Swep config
 SWEP.launchForce = 2200000

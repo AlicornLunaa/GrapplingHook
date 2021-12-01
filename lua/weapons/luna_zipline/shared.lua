@@ -76,7 +76,9 @@ function SWEP:Cleanup()
     local _hook = self:GetNWEntity("hook")
 
     -- Hook exists, remove it after 3 seconds and also detach it within code
-    if isLaunched then self:EmitSound("release_sound") end
+    if isLaunched and SERVER then
+        luna.playSound("release_sound", self, false, nil)
+    end
 
     self:SetNWBool("launched", false)
 
@@ -107,7 +109,6 @@ function SWEP:PrimaryAttack()
     -- Run functions
     if !isLaunched then
         -- Hook has not been launched, launch it.
-        self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
         -- Serverside only
@@ -136,6 +137,7 @@ function SWEP:PrimaryAttack()
             self:SetNWEntity("start", ent2)
             self:SetNWBool("launched", true)
 
+            luna.playSound("firing_sound", self, false, nil)
             self.distance = 0
         end
     end

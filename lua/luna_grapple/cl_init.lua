@@ -50,3 +50,25 @@ sound.Add({
     pitch = 100,
     sound = "ambient/tones/fan2_loop.wav"
 })
+
+-- Net messages
+net.Receive("luna:grapple:playSound", function()
+    -- Play the sound requested
+    local name = net.ReadString()
+    local entity = net.ReadEntity()
+    local _local = net.ReadBool()
+
+    if _local then
+        EmitSound(name, Vector(0, 0, 0), -2)
+    else
+        entity:EmitSound(name)
+    end
+end )
+
+net.Receive("luna:grapple:stopSound", function()
+    -- Play the sound requested
+    local name = net.ReadString()
+    local entity = net.ReadEntity()
+
+    entity:StopSound(name)
+end )

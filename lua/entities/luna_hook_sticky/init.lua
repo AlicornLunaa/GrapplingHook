@@ -34,7 +34,7 @@ function ENT:PhysicsCollide(collision, collider)
         self.parent = collision.HitEntity
         self.lastCollision = collision
 
-        self:EmitSound("garrysmod/balloon_pop_cute.wav")
-        self.launcher:EmitSound("common/stuck1.wav", 100)
+        luna.playSound("garrysmod/balloon_pop_cute.wav", self, false, nil)
+        luna.playSound("common/stuck1.wav", self, true, self.launcher)
     end
 end

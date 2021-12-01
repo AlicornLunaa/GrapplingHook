@@ -28,8 +28,8 @@ function SWEP:Cleanup()
 
     -- Sounds
     if self:GetOwner():IsValid() then
-        self:GetOwner():StopSound("reel_sound")
-        self:GetOwner():EmitSound("release_sound")
+        luna.stopSound("reel_sound", self, nil)
+        luna.playSound("release_sound", self, false, nil)
     end
 
     -- Make sure the hook is detached from forces
@@ -56,7 +56,8 @@ function SWEP:PrimaryAttack()
         -- Hook has not been launched, launch it.
         self:SetNextPrimaryFire(CurTime() + 0.2)
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
-        ply:EmitSound("firing_sound")
+        luna.playSound("firing_sound", self, false, nil)
+        luna.playSound("reel_sound", self, false, nil)
 
         -- Get positional data
         local boneTransform = self:GetAttachment(1)

@@ -10,7 +10,7 @@ function ENT:PhysicsCollide(collision, collider)
         self.lastCollision = collision
 
         -- Feedback
-        self:EmitSound("phx/epicmetal_hard7.wav")
-        self.launcher:EmitSound("common/stuck1.wav", 120)
+        luna.playSound("phx/epicmetal_hard7.wav", self, false, nil)
+        luna.playSound("common/stuck1.wav", self, true, self.launcher)
     end
 end

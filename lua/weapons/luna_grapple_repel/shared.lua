@@ -38,7 +38,7 @@ function SWEP:PrimaryAttack()
         -- Hook has not been launched, launch it.
         self:SetNextPrimaryFire(CurTime() + 0.2)
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
-        ply:EmitSound("firing_sound")
+        luna.playSound("firing_sound", self, false, nil)
 
         -- Get positional data
         local boneTransform = self:GetAttachment(1)
@@ -72,6 +72,8 @@ function SWEP:PrimaryAttack()
                 ent.lastDistance = math.Clamp(distance, 1, ent.maxDistance)
                 ent.targetDistance = math.Clamp(distance, 1, ent.maxDistance)
                 ent:SetHookActive(true)
+
+                luna.playSound("reel_sound", self, false, nil)
 
                 -- Stop listening for a release
                 hook.Remove("KeyRelease", "hookLaunchActive" .. tostring(ent:EntIndex()))

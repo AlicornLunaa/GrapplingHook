@@ -79,32 +79,7 @@ function ENT:Draw()
         pos:Rotate(Angle(0, 120, 0))
     end
 
-    -- Draw the rope if the player exists
-    local ply = self:GetHookLauncher()
-    local hookAttached = self:GetHookAttached()
-
-    if ply:IsValid() and hookAttached then
-        -- Get the viewmodel attach position
-        local wep = ply:GetActiveWeapon()
-        local vm = ply:GetViewModel()
-
-        -- Get the position to draw to
-        if wep:IsValid() then
-            local boneTransform = wep:GetAttachment(1)
-
-            -- Fix position if its being rendered to the viewmodel
-            if vm:IsValid() and wep:IsCarriedByLocalPlayer() and ply:GetViewEntity() == ply then
-                boneTransform = vm:GetAttachment(1)
-            end
-
-            -- Draw the actual beam
-            self:SetRenderBoundsWS(self:GetPos(), ply:GetPos(), Vector(8, 8, 8))
-            cam.Start3D()
-                render.SetMaterial(self.cableMaterial)
-                render.DrawBeam(self:LocalToWorld(self.attachPosition), boneTransform.Pos, 1, 1, 1, Color(255, 255, 255))
-            cam.End3D()
-        end
-    end
+    self:DrawRope()
 end
 
 function ENT:OnRemove()

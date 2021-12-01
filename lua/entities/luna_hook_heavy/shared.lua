@@ -12,3 +12,4 @@ ENT.maxDistance = 100000
 ENT.pullForce = 0.12
 ENT.lerp = 1000
 ENT.cableMaterial = Material("cable/cable2")
+ENT.requiredSpeed = 100

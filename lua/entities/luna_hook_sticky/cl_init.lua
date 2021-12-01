@@ -39,6 +39,8 @@ function ENT:Draw()
     self.plungerMdl:SetRenderOrigin(self:LocalToWorld(Vector(0, 0, 0)))
     self.plungerMdl:SetRenderAngles(self:LocalToWorldAngles(Angle(0, 0, 0)))
     self.plungerMdl:DrawModel()
+
+    self:DrawRope()
 end
 
 function ENT:OnRemove()

@@ -1,15 +1,10 @@
 -- Swep info
 SWEP.Base = "luna_grapple_base"
-SWEP.Author	= "AlicornLunaa"
 SWEP.Instructions = "Primary to launch\nRelease to detach"
 SWEP.Spawnable = true
 
 -- Swep config
 SWEP.launchForce = 450000
-SWEP.maxDistance = 1000000
-SWEP.pullForce = 0.12
-SWEP.maxLerp = 0
-SWEP.cableMaterial = Material("cable/cable2")
 SWEP.hookClass = "luna_hook_sticky"
 SWEP.weaponColor = Color(100, 100, 250)
 

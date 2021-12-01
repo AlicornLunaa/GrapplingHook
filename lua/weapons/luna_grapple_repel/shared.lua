@@ -1,110 +1,78 @@
 -- Swep info
-SWEP.Base = "luna_grapple_base"
+SWEP.Base = "luna_grapple_basic"
 SWEP.Author	= "AlicornLunaa"
-SWEP.Instructions = "Primary to launch\nReload to detach"
-SWEP.Spawnable = true
+SWEP.Instructions = "Primary to launch and reel\nSecondary to expand\nReload to detach"
 
 -- Swep config
-SWEP.launchForce = 85000
-SWEP.maxDistance = 100000
+SWEP.launchForce = 150000
 SWEP.reelSpeed = 4
-SWEP.pullForce = 0.12
-SWEP.maxLerp = 1000
-SWEP.cableMaterial = Material("cable/cable2")
 SWEP.hookClass = "luna_hook_basic"
 SWEP.weaponColor = Color(255, 0, 255)
 
--- Utility functions
-local function sign(a)
-    -- This function returns a -1 0 or 1 depending on the sign on the variable supplied
-    if a < 0 then
-        return -1
-    elseif a > 0 then
-        return 1
-    else
-        return 0
-    end
-end
-
 -- Functions
-function SWEP:Think()
-    -- Serverside code
-    if SERVER then
-        -- Only run when the game is running
-        if !self:IsValid() then return end
-        if game.SinglePlayer() and gameUIVisible then return end
+function SWEP:Reel()
+    -- This function starts reeling in the direction supplied
+    -- Error checking
+    if !SERVER then return end
+    if game.SinglePlayer() and gameUIVisible then return end
+    if !self.hook or !self.hook:IsValid() then return end
 
-        -- Get variables
-        local launched = self:GetNWBool("launched", false)
-        local _hook = self:GetNWEntity("hook")
-
-        -- Pull the player AND hook together
-        if launched and _hook:IsValid() and self:GetOwner():IsValid() then
-            -- Get directions for hooks
-            local hookPos = _hook:LocalToWorld(_hook.attachPosition)
-            local ownerToHook = (hookPos - self:GetOwner():GetPos()):GetNormalized()
-            local hookToOwner = (self:GetOwner():GetPos() - hookPos):GetNormalized()
-
-            -- Get a variable to check if theyre moving towards or away the hook
-            local currentDistance = self:GetOwner():GetPos():Distance(hookPos)
-            local deltaDistance = currentDistance - self:GetNWFloat("lastDistance", 1)
-            local distanceSign = sign(deltaDistance)
-            self:SetNWFloat("lastDistance", currentDistance)
-            self:SetNWFloat("distance", currentDistance + 100)
-
-            -- Forces for hooks and player
-            local distanceForce = math.max(currentDistance - self:GetNWFloat("distance", 1) + math.Clamp(self:GetOwner():GetVelocity():Length(), -self.maxLerp, self.maxLerp) * distanceSign, 0)
-            self:GetOwner():SetVelocity(ownerToHook * self.pullForce * distanceForce)
-            _hook:GetPhysicsObject():ApplyForceCenter(hookToOwner * self.pullForce * 100 * distanceForce)
-        end
-    end
+    -- Start changing values
+    self.hook.targetDistance = self.hook.lastDistance + 100
 end
 
 function SWEP:PrimaryAttack()
     -- This function will launch the hook and wait for it to grapple
     -- or it will reel the grapple in depending on the status of it
-    -- Store data in variables
+    if !SERVER then return end
     if !self:GetOwner():IsValid() then return end
 
-    -- Save data
-    local lookDirection = self:GetOwner():GetAimVector()
-    local isLaunched = self:GetNWBool("launched", false)
+    -- Collect variables
+    local ply = self:GetOwner()
+    local vm = ply:GetViewModel()
+    local lookDirection = ply:GetAimVector()
 
-    -- Run functions
-    if !isLaunched then
+    -- Logic
+    if !self.hook or !self.hook:IsValid() or !self.hook.hookAttached then
         -- Hook has not been launched, launch it.
         self:SetNextPrimaryFire(CurTime() + 0.2)
-        self:EmitSound("firing_sound")
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+        ply:EmitSound("firing_sound")
 
-        self:SetNWBool("ropeAttached", true)
+        -- Get positional data
+        local boneTransform = self:GetAttachment(1)
 
-        -- Serverside only
-        if SERVER then
-            -- Spawn the hook at hand and launch it in the look direction
-            local viewModel = self:GetOwner():GetViewModel()
-            local attachmentPoint = self:GetAttachment(1)
+        if vm:IsValid() and boneTransform then
+            -- Spawn the hook at the end of the muzzle
             local ent = ents.Create(self.hookClass)
-            ent:SetPos(attachmentPoint.Pos + viewModel:GetForward() * ent.positionOffset.x)
-            ent:SetAngles(viewModel:LocalToWorldAngles(ent.angleOffset))
-            ent:SetOwner(self:GetOwner())
+            ent:SetPos(boneTransform.Pos + vm:GetForward() * ent.positionOffset.x)
+            ent:SetAngles(vm:LocalToWorldAngles(ent.angleOffset))
             ent:Spawn()
+            ent:SetHookLauncher(self:GetOwner())
             ent:SetColor(self.weaponColor)
+
+            -- Launch the hook
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 
+            -- Save references to new data
+            self.hook = ent
             self:SetNWEntity("hook", ent)
 
             -- Setup the launch function to activate once the key is released
-            hook.Add("KeyRelease", "hookLaunchActive", function(ply, key)
-                if key == IN_ATTACK and self:GetOwner():IsValid() then
-                    local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+            hook.Add("KeyRelease", "hookLaunchActive" .. tostring(ent:EntIndex()), function(_ply, key)
+                -- Error checking
+                if _ply != ply then return end
+                if key != IN_ATTACK then return end
+                if !self:IsValid() or !self:GetOwner():IsValid() then return end
 
-                    self:SetNWFloat("lastDistance", distance)
-                    self:SetNWFloat("distance", math.Clamp(distance, 1, self.maxDistance))
-                    self:SetNWBool("launched", true)
-                end
+                -- Send data to the hook
+                local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+                ent.lastDistance = math.Clamp(distance, 1, ent.maxDistance)
+                ent.targetDistance = math.Clamp(distance, 1, ent.maxDistance)
+                ent:SetHookAttached(true)
 
-                hook.Remove("KeyRelease", "hookLaunchActive")
+                -- Stop listening for a release
+                hook.Remove("KeyRelease", "hookLaunchActive" .. tostring(ent:EntIndex()))
             end )
         end
     end

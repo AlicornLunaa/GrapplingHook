@@ -1,6 +1,6 @@
 -- Entity information
-ENT.Base = "luna_hook_sticky"
-ENT.PrintName = "Heavy hook"
+ENT.Base = "luna_hook_base"
+ENT.PrintName = "Basic hook"
 
 -- Render config
 ENT.attachPosition = Vector(0, 0, 0)

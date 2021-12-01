@@ -79,7 +79,7 @@ function SWEP:PrimaryAttack()
             self:SetNWEntity("hook", ent)
 
             -- Send data to the hook
-            local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
+            local distance = self:GetOwner():GetPos():Distance(ent:GetPos()) + ent:GetVelocity():Length() - ply:GetVelocity():Length()
             ent.lastDistance = math.Clamp(distance, 1, ent.maxDistance)
             ent.targetDistance = math.Clamp(distance, 1, ent.maxDistance)
             ent:SetHookAttached(true)

@@ -7,7 +7,7 @@ function ENT:PhysicsCollide(collision, collider)
     if !self.parent and !self.attached and collision.Speed >= self.requiredSpeed then
         -- Ready for attachment
         self.parent = collision.HitEntity
-        self.collision = collision
+        self.lastCollision = collision
 
         -- Feedback
         self:EmitSound("phx/epicmetal_hard7.wav")

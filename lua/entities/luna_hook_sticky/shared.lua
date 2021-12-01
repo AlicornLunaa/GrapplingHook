@@ -16,6 +16,8 @@ ENT.cableMaterial = Material("cable/cable2")
 -- Functions
 function ENT:HookAttach()
     -- This function will attach the hook to any surface it touches
+    if !SERVER then return end
+
     if self.parent and !self.attached then
         -- Parent exists but not attached, weld it
         self:SetPos(self.lastCollision.HitPos)

@@ -50,7 +50,7 @@ function SWEP:Think()
             local deviance = newPos:GetNormalized():Dot(plyPos:GetNormalized())
 
             ply:SetVelocity((newPos - plyPos):GetNormalized() * (50 * deviance) - (ply:GetVelocity() * 0.05))
-            self.distance = self.distance + 0.001
+            self.distance = self.distance + 0.002
 
             if self.distance >= 1 then
                 self:Cleanup()
@@ -120,6 +120,7 @@ function SWEP:PrimaryAttack()
             ent:SetAngles(viewModel:LocalToWorldAngles(ent.angleOffset))
             ent:SetOwner(self:GetOwner())
             ent:Spawn()
+            ent:SetHookLauncher(self:GetOwner())
             ent:SetColor(self.weaponColor)
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)
 

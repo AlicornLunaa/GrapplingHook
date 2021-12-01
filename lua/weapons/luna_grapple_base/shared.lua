@@ -227,9 +227,10 @@ function SWEP:DrawWorldModel(flags)
 
     -- Get positional data for the hook
     local boneTransform = self:GetAttachment(1)
+    local _hook = self:GetNWEntity("hook", NULL)
 
     -- Get location to attach to
-    if self.hookMdl:IsValid() and boneTransform then
+    if self.hookMdl:IsValid() and (!_hook:IsValid() or !_hook:GetHookAttached()) and boneTransform then
         -- Draw the hook since there is none launched
         local pos, ang = LocalToWorld(self.hookMdl.positionOffset, self.hookMdl.angleOffset, boneTransform.Pos, boneTransform.Ang)
         self.hookMdl:SetRenderOrigin(pos)

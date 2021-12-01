@@ -32,7 +32,7 @@ function SWEP:Think()
     if SERVER then
         -- Skip if game is paused in singleplayer to avoid launch glitch
         if !self:IsValid() or !self:GetOwner():IsValid() then return end
-        if game.SinglePlayer() and gameUIVisible then return end
+        if game.SinglePlayer() and luna.gameUIVisible then return end
 
         -- Get variables
         local isLaunched = self:GetNWBool("launched", false)

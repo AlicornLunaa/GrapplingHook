@@ -33,7 +33,7 @@ function SWEP:Reel()
     -- This function starts reeling in the direction supplied
     -- Error checking
     if !SERVER then return end
-    if game.SinglePlayer() and gameUIVisible then return end
+    if game.SinglePlayer() and luna.gameUIVisible then return end
     if !self.hook or !self.hook:IsValid() then return end
     if self.direction == 0 then return end
 

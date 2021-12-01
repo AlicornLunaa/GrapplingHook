@@ -1,5 +1,5 @@
 -- Client initialization
-gameUIVisible = false
+local gameUIVisible = false
 
 local function updateUIVisible()
     -- Update variables
@@ -58,6 +58,8 @@ net.Receive("luna:grapple:playSound", function()
     local entity = net.ReadEntity()
     local _local = net.ReadBool()
 
+    if !entity:IsValid() then return end
+
     if _local then
         EmitSound(name, Vector(0, 0, 0), -2)
     else
@@ -69,6 +71,8 @@ net.Receive("luna:grapple:stopSound", function()
     -- Play the sound requested
     local name = net.ReadString()
     local entity = net.ReadEntity()
+
+    if !entity:IsValid() then return end
 
     entity:StopSound(name)
 end )

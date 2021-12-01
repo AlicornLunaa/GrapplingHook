@@ -50,6 +50,7 @@ function SWEP:PrimaryAttack()
             ent:SetAngles(vm:LocalToWorldAngles(ent.angleOffset))
             ent:Spawn()
             ent:SetHookLauncher(self:GetOwner())
+            ent:SetHookAttached(true)
             ent:SetColor(self.weaponColor)
 
             -- Launch the hook
@@ -70,7 +71,7 @@ function SWEP:PrimaryAttack()
                 local distance = self:GetOwner():GetPos():Distance(ent:GetPos())
                 ent.lastDistance = math.Clamp(distance, 1, ent.maxDistance)
                 ent.targetDistance = math.Clamp(distance, 1, ent.maxDistance)
-                ent:SetHookAttached(true)
+                ent:SetHookActive(true)
 
                 -- Stop listening for a release
                 hook.Remove("KeyRelease", "hookLaunchActive" .. tostring(ent:EntIndex()))

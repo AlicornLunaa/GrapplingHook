@@ -34,6 +34,7 @@ function SWEP:Cleanup()
 
     -- Make sure the hook is detached from forces
     self.hook:SetHookAttached(false)
+    self.hook:SetHookActive(false)
 
     -- Remove hook now
     if self.hook and self.hook:IsValid() then self.hook:Remove() end
@@ -67,6 +68,7 @@ function SWEP:PrimaryAttack()
             ent:SetAngles(vm:LocalToWorldAngles(ent.angleOffset))
             ent:Spawn()
             ent:SetHookLauncher(self:GetOwner())
+            ent:SetHookActive(true)
             ent:SetColor(self.weaponColor)
 
             -- Launch the hook

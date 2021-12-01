@@ -12,6 +12,7 @@ function ENT:Initialize()
     self:DrawShadow(false)
 
     self.hookAttached = false
+    self.hookActive = false
     self.lastDistance = 1
     self.targetDistance = 1
 

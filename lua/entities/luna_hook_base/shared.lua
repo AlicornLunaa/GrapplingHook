@@ -46,6 +46,12 @@ function ENT:SetHookAttached(attached)
     self:SetNWBool("hookAttached", attached)
 end
 
+function ENT:SetHookActive(active)
+    -- Sets the value of the active status
+    self.hookActive = active
+    self:SetNWBool("hookActive", active)
+end
+
 -- Getters
 function ENT:GetHookLauncher()
     -- Gets the launcher of the hook
@@ -54,6 +60,10 @@ end
 
 function ENT:GetHookAttached()
     return self:GetNWBool("hookAttached", false)
+end
+
+function ENT:GetHookActive()
+    return self:GetNWBool("hookActive", false)
 end
 
 -- Functions
@@ -90,7 +100,7 @@ function ENT:Think()
     local physObj = self:GetPhysicsObject()
 
     -- Keep the player in by the specificed distance
-    if physObj:IsValid() and self.hookAttached then
+    if physObj:IsValid() and self.hookActive then
         self:ForceCalculation(physObj)
     end
 

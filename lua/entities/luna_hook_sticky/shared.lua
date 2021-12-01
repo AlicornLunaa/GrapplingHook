@@ -54,7 +54,7 @@ function ENT:Think()
     local physObj = self:GetPhysicsObject()
 
     -- Keep the player in by the specificed distance
-    if physObj:IsValid() and self.hookAttached then
+    if physObj:IsValid() and self.hookActive then
         self:ForceCalculation(physObj)
     end
 

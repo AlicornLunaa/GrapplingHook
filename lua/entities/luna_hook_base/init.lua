@@ -12,7 +12,8 @@ function ENT:Initialize()
     self:SetSolid(SOLID_VPHYSICS)
     self:DrawShadow(false)
 
-    self.hookAttached = false
+    self.hookAttached = false -- To draw rope or not
+    self.hookActive = false -- To use physics calculations or not
     self.lastDistance = 1
     self.targetDistance = 1
 

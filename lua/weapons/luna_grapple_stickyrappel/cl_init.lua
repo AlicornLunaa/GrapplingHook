@@ -1,4 +1,4 @@
 include("shared.lua")
 
-SWEP.PrintName = "Repel Grappling Hook"
+SWEP.PrintName = "Sticky Rappel Hook"
 SWEP.Category = "Luna's Grappling Hooks"

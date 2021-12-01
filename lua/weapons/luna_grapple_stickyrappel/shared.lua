@@ -1,5 +1,5 @@
 -- Swep info
-SWEP.Base = "luna_grapple_repel"
+SWEP.Base = "luna_grapple_rappel"
 SWEP.Spawnable = true
 
 -- Swep config

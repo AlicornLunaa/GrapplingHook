@@ -22,7 +22,7 @@ Assorted grappling hooks for the game Garry's Mod.
         - Primary fire launches
         - Releasing primary fire detaches
 
-    - Repel variants
+    - Rappel variants
         - Does or doesn't stick to surface depending on the type selected
         - Gravity on hook
         - Meant to carry you to the ground safely

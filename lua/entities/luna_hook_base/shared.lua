@@ -19,18 +19,6 @@ ENT.pullForce = 0.12
 ENT.lerp = 1000
 ENT.cableMaterial = Material("cable/cable2")
 
--- Utility functions
-local function sign(a)
-    -- This function returns a -1 0 or 1 depending on the sign on the variable supplied
-    if a < 0 then
-        return -1
-    elseif a > 0 then
-        return 1
-    else
-        return 0
-    end
-end
-
 -- Shared functions
 -- Setters
 function ENT:SetHookLauncher(ply)
@@ -78,7 +66,7 @@ function ENT:ForceCalculation(physObj)
 
     -- Get the distance to hold the player in at
     local currentDistance = self.launcher:GetPos():Distance(hookPosition)
-    local distanceSign = sign(currentDistance - self.lastDistance)
+    local distanceSign = luna.sign(currentDistance - self.lastDistance)
     self.lastDistance = currentDistance
 
     -- Apply forces

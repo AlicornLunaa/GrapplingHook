@@ -1,16 +1,16 @@
 -- Entity information
 ENT.Base = "luna_hook_sticky"
-ENT.PrintName = "Basic hook"
+ENT.PrintName = "Springy hook"
 
 -- Render config
-ENT.attachPosition = Vector(0, 0, 0)
-ENT.positionOffset = Vector(-8, -0.5, 0)
-ENT.angleOffset = Angle(90, 0, 0)
+ENT.attachPosition = Vector(0, 0, 18)
+ENT.positionOffset = Vector(8, -0.5, 0)
+ENT.angleOffset = Angle(90, 180, 0)
 
 -- Hook config
 ENT.maxDistance = 100000
-ENT.pullForce = 0.12
-ENT.lerp = 0
+ENT.pullForce = 0.02
+ENT.lerp = 1000
 ENT.cableMaterial = Material("cable/cable2")
 
 -- Functions
@@ -30,7 +30,8 @@ function ENT:ForceCalculation(physObj)
 
     -- Apply forces
     local compensation = math.Clamp(self.launcher:GetVelocity():Length(), -self.lerp, self.lerp) * distanceSign
-    local force = math.max(currentDistance - self.targetDistance + compensation, 0)
+    local force = currentDistance - self.targetDistance + compensation
 
     self.launcher:SetVelocity(ownerToHook * self.pullForce * force)
+    physObj:ApplyForceCenter(ownerToHook * self.pullForce * force * -1000)
 end

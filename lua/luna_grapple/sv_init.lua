@@ -36,6 +36,17 @@ function luna.stopSound(name, entity, target)
     end
 end
 
+function luna.sign(a)
+    -- This function returns a -1 0 or 1 depending on the sign on the variable supplied
+    if a < 0 then
+        return -1
+    elseif a > 0 then
+        return 1
+    else
+        return 0
+    end
+end
+
 -- Net messages
 net.Receive("luna:grapple:uiVisibleChanged", function(len, ply)
     -- Change the serverside variable

@@ -26,6 +26,19 @@ function ENT:CreateModels()
     self.baseMdl = ent
 end
 
+function ENT:DebugCollider()
+    -- This function will draw the shape of the collider
+    if !self.vertices then return end
+    for c, collider in pairs(self.vertices) do
+        for i, p1 in pairs(collider) do
+            for j, p2 in pairs(collider) do
+                if i == j then continue end
+                render.DrawLine(self:LocalToWorld(p1), self:LocalToWorld(p2), Color(255 - c * 50, 50 + c * 50, 0 + c * 50))
+            end
+        end
+    end
+end
+
 function ENT:Draw()
     -- Make sure models exist
     if !self.baseMdl or !self.baseMdl:IsValid() then self:CreateModels() end

@@ -31,6 +31,13 @@ function ENT:Draw()
         pos:Rotate(Angle(0, 120, 0))
     end
 
+    -- Fix render bounds
+    local ply = self:GetHookLauncher()
+
+    if ply:IsValid() then
+        self:SetRenderBoundsWS(self:GetPos(), ply:GetPos(), Vector(8, 8, 8))
+    end
+
     -- Draw beam
     local _hook = self:GetNWEntity("hook")
 

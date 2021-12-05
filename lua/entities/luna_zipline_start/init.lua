@@ -11,6 +11,9 @@ function ENT:Initialize()
 
     self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 
+    self.playerDistance = 0
+    self.distance = 0
+
     local phys = self:GetPhysicsObject()
     if phys:IsValid() then
         phys:EnableMotion(false)

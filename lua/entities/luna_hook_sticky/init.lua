@@ -29,7 +29,9 @@ end
 
 function ENT:PhysicsCollide(collision, collider)
     -- This function makes the plunger stick when it hits something
-    if !self.parent then
+    if !self.launcher or !self.launcher:IsValid() then return end
+
+    if !self.parent and self.launcher != collision.HitEntity then
         -- Only attach if there is no parent already attached
         self.parent = collision.HitEntity
         self.lastCollision = collision

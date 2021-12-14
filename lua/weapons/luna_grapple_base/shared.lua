@@ -149,7 +149,7 @@ function SWEP:PrimaryAttack()
                 if !self:IsValid() or !self:GetOwner():IsValid() then return end
 
                 -- Send data to the hook
-                local distance = self:GetOwner():GetPos():Distance(ent:GetPos()) + ent:GetVelocity():Length() - ply:GetVelocity():Length()
+                local distance = self:GetOwner():GetPos():Distance(ent:GetPos()) + (ent:GetVelocity():Length() - ply:GetVelocity():Length()) * 0.08
                 ent.lastDistance = math.Clamp(distance, 1, ent.maxDistance)
                 ent.targetDistance = math.Clamp(distance, 1, ent.maxDistance)
                 ent:SetHookActive(true)

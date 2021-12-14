@@ -74,7 +74,7 @@ function ENT:ForceCalculation(physObj)
     local force = math.max(currentDistance - self.targetDistance + compensation, 0)
 
     self.launcher:SetVelocity(ownerToHook * self.pullForce * force)
-    physObj:ApplyForceCenter(ownerToHook * self.pullForce * force * -100)
+    physObj:ApplyForceCenter(ownerToHook * self.pullForce * force * -240)
 end
 
 function ENT:Think()

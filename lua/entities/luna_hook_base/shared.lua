@@ -25,6 +25,7 @@ function ENT:SetHookLauncher(ply)
     -- Sets the launcher of the hook
     if !ply:IsValid() then return end
     self.launcher = ply
+    self:SetOwner(ply)
     self:SetNWEntity("launcher", ply)
 end
 

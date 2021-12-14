@@ -4,8 +4,8 @@ SWEP.Instructions = "Primary to launch\nRelease to detach"
 SWEP.Spawnable = true
 
 -- Swep config
-SWEP.launchForce = 2200000
-SWEP.hookClass = "luna_hook_sticky"
+SWEP.launchForce = 190000
+SWEP.hookClass = "luna_hook_fast"
 SWEP.weaponColor = Color(100, 100, 250)
 
 -- Functions

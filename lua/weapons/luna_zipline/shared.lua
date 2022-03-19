@@ -18,7 +18,7 @@ SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
 
 -- Swep config
-SWEP.launchForce = 6000000
+SWEP.launchForce = 600000
 SWEP.reelSpeed = 4
 SWEP.hookClass = "luna_hook_heavy"
 SWEP.weaponColor = Color(255, 255, 255)

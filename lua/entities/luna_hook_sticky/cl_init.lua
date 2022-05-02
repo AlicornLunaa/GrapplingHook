@@ -28,7 +28,7 @@ end
 
 function ENT:Draw()
     -- Make sure models exist
-    if !self.handleMdl or !self.handleMdl:IsValid() then self:CreateModels() end
+    if !self.handleMdl or !self.plungerMdl or !self.handleMdl:IsValid() or !self.plungerMdl:IsValid() then self:CreateModels() end
 
     -- Draw the model
     self.handleMdl:SetRenderOrigin(self:LocalToWorld(Vector(0, 0, 3.9)))

@@ -28,7 +28,7 @@ end
 
 function ENT:Draw()
     -- Make sure models exist
-    if !self.baseMdl or !self.baseMdl:IsValid() then self:CreateModels() end
+    if !self.baseMdl or !self.hookMdl or !self.baseMdl:IsValid() or !self.hookMdl:IsValid() then self:CreateModels() end
 
     -- Draw the model
     self.baseMdl:SetRenderOrigin(self:LocalToWorld(Vector(0, 0, 3)))
@@ -55,6 +55,6 @@ end
 
 function ENT:OnRemove()
     -- This function removes the fake models, as a garbage collection
-    if self.baseMdl:IsValid() then self.baseMdl:Remove() end
-    if self.hookMdl:IsValid() then self.hookMdl:Remove() end
+    if self.baseMdl and self.baseMdl:IsValid() then self.baseMdl:Remove() end
+    if self.hookMdl and self.hookMdl:IsValid() then self.hookMdl:Remove() end
 end

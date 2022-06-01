@@ -38,7 +38,7 @@ function ENT:HookAttach()
         self.attached = true
     end
 
-    -- Detach is parents are dead :(
+    -- Detach if parents are dead :(
     if self.attached and !self.parent then
         self.parent = false
         self.attached = false

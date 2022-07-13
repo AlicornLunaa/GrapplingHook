@@ -45,6 +45,9 @@ function ENT:DrawRope()
                 boneTransform = vm:GetAttachment(1)
             end
 
+            -- Dont even bother rendering if the attachment is missing
+            if boneTransform == nil then return end
+
             -- Draw the actual beam
             self:SetRenderBoundsWS(self:GetPos(), ply:GetPos(), Vector(8, 8, 8))
             cam.Start3D()

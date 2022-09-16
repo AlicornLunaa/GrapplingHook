@@ -7,6 +7,9 @@ util.AddNetworkString("luna:grapple:stopSound")
 luna = luna or {}
 luna.gameUIVisible = false
 
+-- Convars
+local damageFlag = CreateConVar("luna_grapple_nodamage", 0, FCVAR_LUA_SERVER, "Sets whether or not hooks can do damage to people/things. (1/0)", 0, 1)
+
 function luna.playSound(name, entity, _local, target)
     -- Plays a sound at a specific entity
     net.Start("luna:grapple:playSound")
@@ -51,4 +54,11 @@ end
 net.Receive("luna:grapple:uiVisibleChanged", function(len, ply)
     -- Change the serverside variable
     luna.gameUIVisible = net.ReadBool()
+end )
+
+-- Hooks
+hook.Add("EntityTakeDamage", "luna:grapple:damageNullifier", function(target, info)
+    if(string.StartWith(info:GetAttacker():GetClass(), "luna_") and damageFlag:GetBool()) then
+        return true;
+    end
 end )

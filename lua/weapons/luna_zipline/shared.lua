@@ -37,9 +37,6 @@ function SWEP:Reel()
     if !self.hook or !self.hook:IsValid() then return end
     if !self:GetOwner():IsValid() then return end
 
-    -- Start changing values
-    self.start.distance = math.Clamp(self.start.distance + 0.002 * self.direction, 0, 1)
-
     if self.start.distance >= 1 and self.start.playerDistance < 300 * 300 then
         self:Cleanup()
     end
@@ -127,6 +124,7 @@ function SWEP:PrimaryAttack()
             ent2:SetPos(self:GetOwner():GetPos() + Vector(0, 0, 30))
             ent2:SetAngles(Angle(0, 0, 0))
             ent2:SetNWEntity("hook", ent)
+            ent2:SetNWEntity("wep", self)
             ent2:Spawn()
             ent2:SetHookLauncher(self:GetOwner())
 

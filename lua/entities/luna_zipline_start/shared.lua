@@ -57,6 +57,14 @@ function ENT:Think()
     -- Run force calculations
     local physObj = self:GetPhysicsObject()
     local _hook = self:GetNWEntity("hook", NULL)
+    local _wep = self:GetNWEntity("wep", NULL)
+
+    -- Start changing values
+    self.distance = math.Clamp(self.distance + 0.002, 0, 1)
+
+    if _wep:IsValid() and self.distance >= 1 and self.playerDistance < 300 * 300 then
+        _wep:Cleanup()
+    end
 
     -- Keep the player in by the specificed distance
     if physObj:IsValid() and _hook:IsValid() and _hook.attached and _hook.zipActive then

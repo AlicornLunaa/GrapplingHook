@@ -12,14 +12,6 @@ SWEP.weaponColor = Color(255, 0, 255)
 
 -- Functions
 function SWEP:Reel()
-    -- This function starts reeling in the direction supplied
-    -- Error checking
-    if !SERVER then return end
-    if game.SinglePlayer() and luna.gameUIVisible then return end
-    if !self.hook or !self.hook:IsValid() then return end
-
-    -- Start changing values
-    self.hook.targetDistance = self.hook.lastDistance + 100
 end
 
 function SWEP:PrimaryAttack()
@@ -52,6 +44,7 @@ function SWEP:PrimaryAttack()
             ent:SetHookLauncher(self:GetOwner())
             ent:SetHookAttached(true)
             ent:SetColor(self.weaponColor)
+            ent:SetSelfReeling(true)
 
             -- Launch the hook
             ent:GetPhysicsObject():ApplyForceCenter(lookDirection * self.launchForce)

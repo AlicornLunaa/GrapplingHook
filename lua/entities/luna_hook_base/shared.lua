@@ -17,6 +17,7 @@ ENT.angleOffset = Angle(90, 0, 0)
 ENT.maxDistance = 100000
 ENT.pullForce = 0.12
 ENT.lerp = 1000
+ENT.selfReeling = false
 ENT.cableMaterial = Material("cable/cable2")
 
 -- Shared functions
@@ -39,6 +40,10 @@ function ENT:SetHookActive(active)
     -- Sets the value of the active status
     self.hookActive = active
     self:SetNWBool("hookActive", active)
+end
+
+function ENT:SetSelfReeling(active)
+    self.selfReeling = true
 end
 
 -- Getters
@@ -84,6 +89,12 @@ function ENT:Think()
     if !SERVER then return end
     if !self.launcher or !self.launcher:IsValid() then return end
     if game.SinglePlayer() and gameUIVisible then return end
+
+    -- Run reel logic
+    if self.selfReeling then
+        -- Start changing values
+        self.targetDistance = self.lastDistance + 100
+    end
 
     -- Run force calculations
     local physObj = self:GetPhysicsObject()

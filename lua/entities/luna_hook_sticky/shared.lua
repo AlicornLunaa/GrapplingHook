@@ -50,6 +50,12 @@ function ENT:Think()
     if !self.launcher or !self.launcher:IsValid() then return end
     if game.SinglePlayer() and gameUIVisible then return end
 
+    -- Run reel logic
+    if self.selfReeling then
+        -- Start changing values
+        self.targetDistance = self.lastDistance + 100
+    end
+
     -- Run force calculations
     local physObj = self:GetPhysicsObject()
 
